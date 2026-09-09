@@ -1,0 +1,21 @@
+entity_type: subagent
+id: pdlc-acceptance-auditor
+version: '2.0'
+canonical_name: pdlc-acceptance-auditor@2.0
+display_name: Аудитор приёмки
+description: Аудитор приёмки
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/pdlc-acceptance-auditor/2.0
+subagent_kind: review
+definition_file: pdlc-acceptance-auditor.md
+checksum: 5196d7471053b35bc8a8464f230495383ca9fd63af84c9c1492efa0a973e9520

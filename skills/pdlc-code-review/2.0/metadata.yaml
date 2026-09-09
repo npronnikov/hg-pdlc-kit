@@ -1,0 +1,20 @@
+entity_type: skill
+id: pdlc-code-review
+version: '2.0'
+canonical_name: pdlc-code-review@2.0
+display_name: Независимый review реализации
+description: Независимый review реализации
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-code-review/2.0
+skill_kind: analysis
+checksum: fbd435182a86f34aae05dc2572882b3bb123455c36a59a62393ed27e2de3f436

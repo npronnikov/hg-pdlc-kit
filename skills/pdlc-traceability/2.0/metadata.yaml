@@ -1,0 +1,20 @@
+entity_type: skill
+id: pdlc-traceability
+version: '2.0'
+canonical_name: pdlc-traceability@2.0
+display_name: Трассируемость и актуальность
+description: Трассируемость и актуальность
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-traceability/2.0
+skill_kind: analysis
+checksum: 245ecab9b562a7bebe57341177b3a0130a8821900d0cc8f7c5218a03372a3b84

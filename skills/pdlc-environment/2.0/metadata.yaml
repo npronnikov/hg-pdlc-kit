@@ -1,0 +1,20 @@
+entity_type: skill
+id: pdlc-environment
+version: '2.0'
+canonical_name: pdlc-environment@2.0
+display_name: Исправление тестового окружения
+description: Исправление тестового окружения
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-environment/2.0
+skill_kind: analysis
+checksum: 1fa5ab4edd455db95e63a4a67a848a09479163c9b62657626f9644ca280461aa

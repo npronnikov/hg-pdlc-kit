@@ -1,0 +1,21 @@
+entity_type: subagent
+id: pdlc-e2e-engineer
+version: '2.0'
+canonical_name: pdlc-e2e-engineer@2.0
+display_name: Автор E2E
+description: Автор E2E
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/pdlc-e2e-engineer/2.0
+subagent_kind: specialist
+definition_file: pdlc-e2e-engineer.md
+checksum: c70c22f09b734013318004aa1f2dd6b7475a954d30ee0fa3f811b071b796eeec

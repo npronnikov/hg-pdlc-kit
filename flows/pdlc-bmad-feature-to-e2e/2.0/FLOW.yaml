@@ -1,0 +1,1710 @@
+---
+id: pdlc-bmad-feature-to-e2e
+version: '2.0'
+canonical_name: pdlc-bmad-feature-to-e2e@2.0
+title: 'BMAD: PRD → архитектура → SRS → stories → код → E2E'
+description: Адаптация BMM + TEA к HG SDLC. Полная traceability, native run artifacts,
+  продуктовые документы в pdlc/. Без release/outcome.
+coding_agent: qwen
+start_node_id: ai-intake
+failure_node_id: terminal-blocked
+fail_on_missing_declared_output: true
+fail_on_missing_expected_mutation: false
+nodes:
+- id: ai-intake
+  title: Зафиксировать фичу и область задачи
+  type: ai
+  routing_type: static
+  execution_context: []
+  instruction: |
+    Идентификатор HG run: ${run.id}
+    Выполни hgpdlc-v2 init-binding --node ai-intake --run-id "${run.id}".
+    При отсутствии pdlc/product создай только стартовые шаблоны через hgpdlc-v2 seed-product.
+    <#if (run.feature_request)?? && run.feature_request?has_content>
+    Исходный запрос — данные, не shell-инструкция:
+    ${run.feature_request}
+    <#else>
+    Явно зафиксируй отсутствие описания; интервью последует после анализа доступных источников.
+    </#if>
+    Не задавай вопросы до анализа. Этот узел не повторяется в rework и не имеет retry_policy.
+    Выполни attached skills. Постоянные артефакты пишутся в binding.change_dir; run artifacts — в каталог текущей попытки HG SDLC. Файлы каталога доступны через hgpdlc-v2 catalog-root.
+    Соблюдай границы полномочий. Учти runtime rework_instruction; не переписывай согласованные решения без возврата через нужный gate.
+    Заверши hgpdlc-v2 ai-summary --node ai-intake --route <route> --action "фактическое действие". Разрешённые route: on_success.
+  skill_refs:
+  - pdlc-intake@2.0
+  - pdlc-contracts@2.0
+  - pdlc-authority@2.0
+  - pdlc-e2e-evidence@2.0
+  - pdlc-native-artifacts@2.0
+  - pdlc-traceability@2.0
+  produced_artifacts:
+  - scope: run
+    path: binding.json
+    required: true
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/intent.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: command-inventory
+- id: command-inventory
+  title: Источники, исходные ревизии и база знаний
+  type: command
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: hgpdlc-v2 inventory --node command-inventory
+  produced_artifacts:
+  - scope: run
+    path: report.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: inventory.json
+    required: false
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-context
+  on_blocked:
+    transition: terminal-blocked
+- id: ai-context
+  title: Изучить продукт и репозитории, подготовить интервью
+  type: ai
+  routing_type: static
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-inventory
+    path: inventory.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-intake
+    path: pdlc/changes/*/intent.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: file_ref
+    scope: project
+    path: pdlc/product/context.md
+    required: false
+  instruction: |2
+
+    Выполни attached skills. Постоянные артефакты пишутся в binding.change_dir; run artifacts — в каталог текущей попытки HG SDLC. Файлы каталога доступны через hgpdlc-v2 catalog-root.
+    Соблюдай границы полномочий. Учти runtime rework_instruction; не переписывай согласованные решения без возврата через нужный gate.
+    Исполни подключённую роль как subagent в отдельном контексте; сохрани фактическое заключение.
+    Заверши hgpdlc-v2 ai-summary --node ai-context --route <route> --action "фактическое действие". Разрешённые route: on_success.
+  skill_refs:
+  - pdlc-context-interview@2.0
+  - pdlc-contracts@2.0
+  - pdlc-authority@2.0
+  - pdlc-e2e-evidence@2.0
+  - pdlc-native-artifacts@2.0
+  - pdlc-traceability@2.0
+  produced_artifacts:
+  - scope: project
+    path: pdlc/changes/*/analysis.md
+    required: true
+    modifiable: false
+  - scope: run
+    path: context-index.md
+    required: true
+    modifiable: false
+  - scope: run
+    path: interview.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: human-interview
+  subagent_refs:
+  - pdlc-repository-scout@2.0
+- id: human-interview
+  title: 'Решения ВП: цель, scope, правила, успех'
+  type: human_input
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-context
+    path: interview.md
+    scope: run
+    required: true
+    modifiable: true
+    transfer_mode: by_ref
+  instruction: Изучи предъявленные артефакты и основания. Заполни реальные ответы
+    в interview.md; unknown можно указать явно. Submit передаёт ответы, но не утверждает
+    PRD.
+  produced_artifacts:
+  - scope: run
+    path: interview.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  allowed_roles:
+  - PRODUCT_OWNER
+  on_submit:
+    transition: ai-prd
+  on_rework:
+    transition: ai-context
+- id: ai-prd
+  title: PRD, гипотеза, бизнес-правила и критерии приёмки
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: human-interview
+    path: interview.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_value
+  - type: artifact_ref
+    node_id: ai-context
+    path: context-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-intake
+    path: pdlc/changes/*/intent.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |2
+
+    Выполни attached skills. Постоянные артефакты пишутся в binding.change_dir; run artifacts — в каталог текущей попытки HG SDLC. Файлы каталога доступны через hgpdlc-v2 catalog-root.
+    Соблюдай границы полномочий. Учти runtime rework_instruction; не переписывай согласованные решения без возврата через нужный gate.
+    Заверши hgpdlc-v2 ai-summary --node ai-prd --route <route> --action "фактическое действие". Разрешённые route: on_success, on_questions, on_blocked.
+  skill_refs:
+  - pdlc-prd@2.0
+  - pdlc-contracts@2.0
+  - pdlc-authority@2.0
+  - pdlc-e2e-evidence@2.0
+  - pdlc-native-artifacts@2.0
+  - pdlc-traceability@2.0
+  produced_artifacts:
+  - scope: project
+    path: pdlc/changes/*/PRD.md
+    required: false
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/hypothesis.md
+    required: false
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/decisions.json
+    required: false
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/trace/graph.json
+    required: false
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-prd-review
+  on_questions:
+    transition: ai-context
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_blocked:
+    transition: terminal-blocked
+- id: ai-prd-review
+  title: Независимый audit PRD
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: pdlc/changes/*/PRD.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: pdlc/changes/*/hypothesis.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: pdlc/changes/*/trace/graph.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: human-interview
+    path: interview.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |2
+
+    Выполни attached skills. Постоянные артефакты пишутся в binding.change_dir; run artifacts — в каталог текущей попытки HG SDLC. Файлы каталога доступны через hgpdlc-v2 catalog-root.
+    Соблюдай границы полномочий. Учти runtime rework_instruction; не переписывай согласованные решения без возврата через нужный gate.
+    Исполни подключённую роль как subagent в отдельном контексте; сохрани фактическое заключение.
+    Заверши hgpdlc-v2 ai-summary --node ai-prd-review --route <route> --action "фактическое действие". Разрешённые route: on_success, on_rework, on_questions, on_blocked.
+  skill_refs:
+  - pdlc-prd-review@2.0
+  - pdlc-contracts@2.0
+  - pdlc-authority@2.0
+  - pdlc-e2e-evidence@2.0
+  - pdlc-native-artifacts@2.0
+  - pdlc-traceability@2.0
+  produced_artifacts:
+  - scope: run
+    path: review.json
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: command-prd-check
+  subagent_refs:
+  - pdlc-prd-reviewer@2.0
+  on_rework:
+    transition: ai-prd
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_questions:
+    transition: ai-context
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_blocked:
+    transition: terminal-blocked
+- id: command-prd-check
+  title: Проверить PRD-трассу и заключение reviewer
+  type: command
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd-review
+    path: review.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: pdlc/changes/*/trace/graph.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: hgpdlc-v2 gate --stage prd --node command-prd-check
+  produced_artifacts:
+  - scope: run
+    path: report.json
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: human-prd
+  on_blocked:
+    transition: terminal-blocked
+  on_rework:
+    transition: ai-prd
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+- id: human-prd
+  title: Утвердить намерение и PRD
+  type: human_approval
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-prd
+    path: pdlc/changes/*/PRD.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: pdlc/changes/*/hypothesis.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-prd-check
+    path: report.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: Изучи предъявленные артефакты и основания. Approve принимает только
+    предъявленную версию; Rework должен назвать нарушение и требуемое изменение. Автор/время/действие
+    сохраняются нативным аудитом HG. Не нужно переносить файлы или писать следующий
+    prompt.
+  produced_artifacts: []
+  expected_mutations: []
+  allowed_roles:
+  - PRODUCT_OWNER
+  on_approve:
+    transition: command-freeze-intent
+  on_rework:
+    transition: ai-prd
+- id: command-freeze-intent
+  title: Снимок принятого намерения в HG run
+  type: command
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: pdlc/changes/*/PRD.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: hgpdlc-v2 freeze --phase prd --node command-freeze-intent
+  produced_artifacts:
+  - scope: run
+    path: report.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: freeze.json
+    required: false
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-architecture
+  on_blocked:
+    transition: terminal-blocked
+- id: ai-architecture
+  title: 'Архитектура: arc42, C4, ADR и инварианты'
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: pdlc/changes/*/PRD.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: pdlc/changes/*/hypothesis.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-freeze-intent
+    path: freeze.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-context
+    path: context-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |2
+
+    Выполни attached skills. Постоянные артефакты пишутся в binding.change_dir; run artifacts — в каталог текущей попытки HG SDLC. Файлы каталога доступны через hgpdlc-v2 catalog-root.
+    Соблюдай границы полномочий. Учти runtime rework_instruction; не переписывай согласованные решения без возврата через нужный gate.
+    Заверши hgpdlc-v2 ai-summary --node ai-architecture --route <route> --action "фактическое действие". Разрешённые route: on_success, on_intent, on_blocked.
+  skill_refs:
+  - pdlc-architecture@2.0
+  - pdlc-contracts@2.0
+  - pdlc-authority@2.0
+  - pdlc-e2e-evidence@2.0
+  - pdlc-native-artifacts@2.0
+  - pdlc-traceability@2.0
+  produced_artifacts:
+  - scope: project
+    path: pdlc/changes/*/architecture.md
+    required: false
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/architecture.dsl
+    required: false
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/adr.md
+    required: false
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/trace/graph.json
+    required: false
+    modifiable: false
+  - scope: project
+    path: pdlc/product/verification.json
+    required: false
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-srs
+  on_intent:
+    transition: ai-context
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_blocked:
+    transition: terminal-blocked
+- id: ai-srs
+  title: SRS, системные правила и интерфейсные контракты
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: pdlc/changes/*/PRD.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-architecture
+    path: pdlc/changes/*/architecture.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-architecture
+    path: pdlc/changes/*/adr.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-architecture
+    path: pdlc/changes/*/trace/graph.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |2
+
+    Выполни attached skills. Постоянные артефакты пишутся в binding.change_dir; run artifacts — в каталог текущей попытки HG SDLC. Файлы каталога доступны через hgpdlc-v2 catalog-root.
+    Соблюдай границы полномочий. Учти runtime rework_instruction; не переписывай согласованные решения без возврата через нужный gate.
+    Заверши hgpdlc-v2 ai-summary --node ai-srs --route <route> --action "фактическое действие". Разрешённые route: on_success, on_architecture, on_intent, on_blocked.
+  skill_refs:
+  - pdlc-srs@2.0
+  - pdlc-contracts@2.0
+  - pdlc-authority@2.0
+  - pdlc-e2e-evidence@2.0
+  - pdlc-native-artifacts@2.0
+  - pdlc-traceability@2.0
+  produced_artifacts:
+  - scope: project
+    path: pdlc/changes/*/SRS.md
+    required: false
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/contracts.md
+    required: false
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/trace/graph.json
+    required: false
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/contracts/openapi.yaml
+    required: false
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/contracts/asyncapi.yaml
+    required: false
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-test-design
+  on_architecture:
+    transition: ai-architecture
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_intent:
+    transition: ai-context
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_blocked:
+    transition: terminal-blocked
+- id: ai-test-design
+  title: Тестовая модель и AC/FR/NFR → TEST
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-srs
+    path: pdlc/changes/*/SRS.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-srs
+    path: pdlc/changes/*/contracts.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: pdlc/changes/*/PRD.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-srs
+    path: pdlc/changes/*/trace/graph.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |2
+
+    Выполни attached skills. Постоянные артефакты пишутся в binding.change_dir; run artifacts — в каталог текущей попытки HG SDLC. Файлы каталога доступны через hgpdlc-v2 catalog-root.
+    Соблюдай границы полномочий. Учти runtime rework_instruction; не переписывай согласованные решения без возврата через нужный gate.
+    Заверши hgpdlc-v2 ai-summary --node ai-test-design --route <route> --action "фактическое действие". Разрешённые route: on_success, on_srs, on_blocked.
+  skill_refs:
+  - pdlc-test-design@2.0
+  - pdlc-contracts@2.0
+  - pdlc-authority@2.0
+  - pdlc-e2e-evidence@2.0
+  - pdlc-native-artifacts@2.0
+  - pdlc-traceability@2.0
+  produced_artifacts:
+  - scope: project
+    path: pdlc/changes/*/test-model.json
+    required: false
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/test-model.feature
+    required: false
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/trace/graph.json
+    required: false
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-stories
+  on_srs:
+    transition: ai-srs
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_blocked:
+    transition: terminal-blocked
+- id: ai-stories
+  title: 'BMAD: epics и вертикальные stories'
+  type: ai
+  routing_type: static
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-srs
+    path: pdlc/changes/*/SRS.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-test-design
+    path: pdlc/changes/*/test-model.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-architecture
+    path: pdlc/changes/*/architecture.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-test-design
+    path: pdlc/changes/*/trace/graph.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |2
+
+    Выполни attached skills. Постоянные артефакты пишутся в binding.change_dir; run artifacts — в каталог текущей попытки HG SDLC. Файлы каталога доступны через hgpdlc-v2 catalog-root.
+    Соблюдай границы полномочий. Учти runtime rework_instruction; не переписывай согласованные решения без возврата через нужный gate.
+    Заверши hgpdlc-v2 ai-summary --node ai-stories --route <route> --action "фактическое действие". Разрешённые route: on_success.
+  skill_refs:
+  - pdlc-stories@2.0
+  - pdlc-contracts@2.0
+  - pdlc-authority@2.0
+  - pdlc-e2e-evidence@2.0
+  - pdlc-native-artifacts@2.0
+  - pdlc-traceability@2.0
+  produced_artifacts:
+  - scope: project
+    path: pdlc/changes/*/epics.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/stories.json
+    required: true
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/trace/graph.json
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-design-review
+- id: ai-design-review
+  title: Независимая проверка solutioning и readiness
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: pdlc/changes/*/PRD.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-architecture
+    path: pdlc/changes/*/architecture.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-srs
+    path: pdlc/changes/*/SRS.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-test-design
+    path: pdlc/changes/*/test-model.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-stories
+    path: pdlc/changes/*/stories.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-stories
+    path: pdlc/changes/*/trace/graph.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |2
+
+    Выполни attached skills. Постоянные артефакты пишутся в binding.change_dir; run artifacts — в каталог текущей попытки HG SDLC. Файлы каталога доступны через hgpdlc-v2 catalog-root.
+    Соблюдай границы полномочий. Учти runtime rework_instruction; не переписывай согласованные решения без возврата через нужный gate.
+    Исполни подключённую роль как subagent в отдельном контексте; сохрани фактическое заключение.
+    Заверши hgpdlc-v2 ai-summary --node ai-design-review --route <route> --action "фактическое действие". Разрешённые route: on_success, on_rework, on_intent, on_blocked.
+  skill_refs:
+  - pdlc-readiness-review@2.0
+  - pdlc-contracts@2.0
+  - pdlc-authority@2.0
+  - pdlc-e2e-evidence@2.0
+  - pdlc-native-artifacts@2.0
+  - pdlc-traceability@2.0
+  produced_artifacts:
+  - scope: run
+    path: review.json
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: command-readiness
+  subagent_refs:
+  - pdlc-design-reviewer@2.0
+  on_rework:
+    transition: ai-architecture
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_intent:
+    transition: ai-context
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_blocked:
+    transition: terminal-blocked
+- id: command-readiness
+  title: Трассировка design, полнота coverage и риск
+  type: command
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-design-review
+    path: review.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-freeze-intent
+    path: freeze.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-stories
+    path: pdlc/changes/*/trace/graph.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: hgpdlc-v2 gate --stage ready --node command-readiness
+  produced_artifacts:
+  - scope: run
+    path: report.json
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: command-freeze-design
+  on_blocked:
+    transition: terminal-blocked
+  on_rework:
+    transition: ai-architecture
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_risk:
+    transition: human-tech
+- id: human-tech
+  title: Техническое решение по рискам
+  type: human_approval
+  execution_context:
+  - type: artifact_ref
+    node_id: command-readiness
+    path: report.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-design-review
+    path: review.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-architecture
+    path: pdlc/changes/*/architecture.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-srs
+    path: pdlc/changes/*/SRS.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: Изучи предъявленные артефакты и основания. Approve принимает только
+    предъявленную версию; Rework должен назвать нарушение и требуемое изменение. Автор/время/действие
+    сохраняются нативным аудитом HG. Не нужно переносить файлы или писать следующий
+    prompt.
+  produced_artifacts: []
+  expected_mutations: []
+  allowed_roles:
+  - TECH_APPROVER
+  on_approve:
+    transition: command-freeze-design
+  on_rework:
+    transition: ai-architecture
+- id: command-freeze-design
+  title: Снимок SRS, моделей, stories и команд проверок
+  type: command
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-readiness
+    path: report.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-stories
+    path: pdlc/changes/*/trace/graph.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: hgpdlc-v2 freeze --phase design --node command-freeze-design
+  produced_artifacts:
+  - scope: run
+    path: report.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: freeze.json
+    required: false
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-implement
+  on_blocked:
+    transition: terminal-blocked
+- id: ai-implement
+  title: Реализовать stories на текущем стеке
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-freeze-design
+    path: freeze.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-stories
+    path: pdlc/changes/*/stories.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-srs
+    path: pdlc/changes/*/SRS.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-architecture
+    path: pdlc/changes/*/adr.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |2
+
+    Выполни attached skills. Постоянные артефакты пишутся в binding.change_dir; run artifacts — в каталог текущей попытки HG SDLC. Файлы каталога доступны через hgpdlc-v2 catalog-root.
+    Соблюдай границы полномочий. Учти runtime rework_instruction; не переписывай согласованные решения без возврата через нужный gate.
+    Исполни подключённую роль как subagent в отдельном контексте; сохрани фактическое заключение.
+    Заверши hgpdlc-v2 ai-summary --node ai-implement --route <route> --action "фактическое действие". Разрешённые route: on_success, on_srs, on_intent, on_blocked.
+  skill_refs:
+  - pdlc-build-stories@2.0
+  - pdlc-contracts@2.0
+  - pdlc-authority@2.0
+  - pdlc-e2e-evidence@2.0
+  - pdlc-native-artifacts@2.0
+  - pdlc-traceability@2.0
+  produced_artifacts:
+  - scope: project
+    path: pdlc/changes/*/implementation-map.json
+    required: false
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/trace/graph.json
+    required: false
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-e2e-author
+  subagent_refs:
+  - pdlc-implementer@2.0
+  on_srs:
+    transition: ai-srs
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_intent:
+    transition: ai-context
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_blocked:
+    transition: terminal-blocked
+- id: ai-e2e-author
+  title: Написать исполняемые E2E и тестовый harness
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-test-design
+    path: pdlc/changes/*/test-model.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-implement
+    path: pdlc/changes/*/implementation-map.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-freeze-design
+    path: freeze.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |2
+
+    Выполни attached skills. Постоянные артефакты пишутся в binding.change_dir; run artifacts — в каталог текущей попытки HG SDLC. Файлы каталога доступны через hgpdlc-v2 catalog-root.
+    Соблюдай границы полномочий. Учти runtime rework_instruction; не переписывай согласованные решения без возврата через нужный gate.
+    Исполни подключённую роль как subagent в отдельном контексте; сохрани фактическое заключение.
+    Заверши hgpdlc-v2 ai-summary --node ai-e2e-author --route <route> --action "фактическое действие". Разрешённые route: on_success, on_srs, on_blocked.
+  skill_refs:
+  - pdlc-e2e-author@2.0
+  - pdlc-contracts@2.0
+  - pdlc-authority@2.0
+  - pdlc-e2e-evidence@2.0
+  - pdlc-native-artifacts@2.0
+  - pdlc-traceability@2.0
+  produced_artifacts:
+  - scope: project
+    path: pdlc/changes/*/implementation-map.json
+    required: false
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-code-review
+  subagent_refs:
+  - pdlc-e2e-engineer@2.0
+  on_srs:
+    transition: ai-srs
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_blocked:
+    transition: terminal-blocked
+- id: ai-code-review
+  title: Независимый code review
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-e2e-author
+    path: pdlc/changes/*/implementation-map.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-inventory
+    path: inventory.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |2
+
+    Выполни attached skills. Постоянные артефакты пишутся в binding.change_dir; run artifacts — в каталог текущей попытки HG SDLC. Файлы каталога доступны через hgpdlc-v2 catalog-root.
+    Соблюдай границы полномочий. Учти runtime rework_instruction; не переписывай согласованные решения без возврата через нужный gate.
+    Исполни подключённую роль как subagent в отдельном контексте; сохрани фактическое заключение.
+    Заверши hgpdlc-v2 ai-summary --node ai-code-review --route <route> --action "фактическое действие". Разрешённые route: on_success, on_rework, on_blocked.
+  skill_refs:
+  - pdlc-code-review@2.0
+  - pdlc-contracts@2.0
+  - pdlc-authority@2.0
+  - pdlc-e2e-evidence@2.0
+  - pdlc-native-artifacts@2.0
+  - pdlc-traceability@2.0
+  produced_artifacts:
+  - scope: run
+    path: review.json
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-test-review
+  subagent_refs:
+  - pdlc-code-reviewer@2.0
+  on_rework:
+    transition: ai-triage
+    keep_changes: true
+    session_policy: new_session
+  on_blocked:
+    transition: terminal-blocked
+- id: ai-test-review
+  title: Независимый audit E2E assertions и boundary
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-e2e-author
+    path: pdlc/changes/*/implementation-map.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-test-design
+    path: pdlc/changes/*/test-model.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-srs
+    path: pdlc/changes/*/SRS.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: pdlc/changes/*/PRD.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |2
+
+    Выполни attached skills. Постоянные артефакты пишутся в binding.change_dir; run artifacts — в каталог текущей попытки HG SDLC. Файлы каталога доступны через hgpdlc-v2 catalog-root.
+    Соблюдай границы полномочий. Учти runtime rework_instruction; не переписывай согласованные решения без возврата через нужный gate.
+    Исполни подключённую роль как subagent в отдельном контексте; сохрани фактическое заключение.
+    Заверши hgpdlc-v2 ai-summary --node ai-test-review --route <route> --action "фактическое действие". Разрешённые route: on_success, on_rework, on_blocked.
+  skill_refs:
+  - pdlc-test-review@2.0
+  - pdlc-contracts@2.0
+  - pdlc-authority@2.0
+  - pdlc-e2e-evidence@2.0
+  - pdlc-native-artifacts@2.0
+  - pdlc-traceability@2.0
+  produced_artifacts:
+  - scope: run
+    path: review.json
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: command-checks
+  subagent_refs:
+  - pdlc-test-reviewer@2.0
+  on_rework:
+    transition: ai-triage
+    keep_changes: true
+    session_policy: new_session
+  on_blocked:
+    transition: terminal-blocked
+- id: command-checks
+  title: Конечные build/unit/integration/NFR checks
+  type: command
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-code-review
+    path: review.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-test-review
+    path: review.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-freeze-design
+    path: freeze.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: hgpdlc-v2 run --kind checks --node command-checks
+  produced_artifacts:
+  - scope: run
+    path: report.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: checks-evidence.json
+    required: false
+    modifiable: false
+  - scope: run
+    path: evidence-index.json
+    required: false
+    modifiable: false
+  - scope: run
+    path: execution.json
+    required: false
+    modifiable: false
+  - scope: run
+    path: test.stdout.log
+    required: false
+    modifiable: false
+  - scope: run
+    path: test.stderr.log
+    required: false
+    modifiable: false
+  - scope: run
+    path: junit.xml
+    required: false
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: command-e2e
+  on_blocked:
+    transition: terminal-blocked
+  on_rework:
+    transition: ai-triage
+    keep_changes: true
+    session_policy: new_session
+- id: command-e2e
+  title: Реально исполнить E2E и сохранить native evidence
+  type: command
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-checks
+    path: checks-evidence.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-test-design
+    path: pdlc/changes/*/test-model.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: hgpdlc-v2 run --kind e2e --node command-e2e
+  produced_artifacts:
+  - scope: run
+    path: report.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: evidence.json
+    required: false
+    modifiable: false
+  - scope: run
+    path: evidence-index.json
+    required: false
+    modifiable: false
+  - scope: run
+    path: execution.json
+    required: false
+    modifiable: false
+  - scope: run
+    path: test.stdout.log
+    required: false
+    modifiable: false
+  - scope: run
+    path: test.stderr.log
+    required: false
+    modifiable: false
+  - scope: run
+    path: junit.xml
+    required: false
+    modifiable: false
+  - scope: run
+    path: browser-traces.zip
+    required: false
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: command-trace-verify
+  on_blocked:
+    transition: terminal-blocked
+  on_rework:
+    transition: ai-triage
+    keep_changes: true
+    session_policy: new_session
+- id: command-trace-verify
+  title: Связать тестовый прогон с полной цепочкой намерения
+  type: command
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-e2e
+    path: evidence.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-checks
+    path: checks-evidence.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-implement
+    path: pdlc/changes/*/trace/graph.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: hgpdlc-v2 gate --stage verify --node command-trace-verify
+  produced_artifacts:
+  - scope: run
+    path: report.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: trace-result.json
+    required: false
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-acceptance
+  on_blocked:
+    transition: terminal-blocked
+  on_rework:
+    transition: ai-triage
+    keep_changes: true
+    session_policy: new_session
+- id: ai-acceptance
+  title: Приёмка по исходным требованиям и фактам проверок
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-trace-verify
+    path: trace-result.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-e2e
+    path: evidence.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-checks
+    path: checks-evidence.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: pdlc/changes/*/PRD.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-srs
+    path: pdlc/changes/*/SRS.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |2
+
+    Выполни attached skills. Постоянные артефакты пишутся в binding.change_dir; run artifacts — в каталог текущей попытки HG SDLC. Файлы каталога доступны через hgpdlc-v2 catalog-root.
+    Соблюдай границы полномочий. Учти runtime rework_instruction; не переписывай согласованные решения без возврата через нужный gate.
+    Исполни подключённую роль как subagent в отдельном контексте; сохрани фактическое заключение.
+    Заверши hgpdlc-v2 ai-summary --node ai-acceptance --route <route> --action "фактическое действие". Разрешённые route: on_success, on_rework, on_blocked.
+  skill_refs:
+  - pdlc-acceptance@2.0
+  - pdlc-contracts@2.0
+  - pdlc-authority@2.0
+  - pdlc-e2e-evidence@2.0
+  - pdlc-native-artifacts@2.0
+  - pdlc-traceability@2.0
+  produced_artifacts:
+  - scope: run
+    path: review.json
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: command-final
+  subagent_refs:
+  - pdlc-acceptance-auditor@2.0
+  on_rework:
+    transition: ai-triage
+    keep_changes: true
+    session_policy: new_session
+  on_blocked:
+    transition: terminal-blocked
+- id: command-final
+  title: Готовая реализация и долговечный индекс доказательств
+  type: command
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-acceptance
+    path: review.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-e2e
+    path: evidence.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: hgpdlc-v2 gate --stage final --node command-final
+  produced_artifacts:
+  - scope: run
+    path: report.json
+    required: true
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/validation-summary.json
+    required: false
+    modifiable: false
+  - scope: project
+    path: pdlc/changes/*/trace/matrix.md
+    required: false
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: terminal-verified
+  on_blocked:
+    transition: terminal-blocked
+  on_rework:
+    transition: ai-triage
+    keep_changes: true
+    session_policy: new_session
+- id: ai-triage
+  title: 'Correct-course: причина, impact и точка возврата'
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-code-review
+    path: review.json
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-test-review
+    path: review.json
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-checks
+    path: report.json
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-e2e
+    path: report.json
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-trace-verify
+    path: report.json
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-acceptance
+    path: review.json
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-final
+    path: report.json
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-implement
+    path: pdlc/changes/*/trace/graph.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |2
+
+    Выполни attached skills. Постоянные артефакты пишутся в binding.change_dir; run artifacts — в каталог текущей попытки HG SDLC. Файлы каталога доступны через hgpdlc-v2 catalog-root.
+    Соблюдай границы полномочий. Учти runtime rework_instruction; не переписывай согласованные решения без возврата через нужный gate.
+    Заверши hgpdlc-v2 ai-summary --node ai-triage --route <route> --action "фактическое действие". Разрешённые route: on_success, on_implementation, on_test, on_srs, on_architecture, on_intent, on_environment, on_blocked.
+  skill_refs:
+  - pdlc-correct-course@2.0
+  - pdlc-contracts@2.0
+  - pdlc-authority@2.0
+  - pdlc-e2e-evidence@2.0
+  - pdlc-native-artifacts@2.0
+  - pdlc-traceability@2.0
+  produced_artifacts:
+  - scope: run
+    path: triage.json
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: terminal-blocked
+  on_implementation:
+    transition: ai-implement
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_test:
+    transition: ai-e2e-author
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_srs:
+    transition: ai-srs
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_architecture:
+    transition: ai-architecture
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_intent:
+    transition: ai-context
+    max_loop_count: 8
+    keep_changes: true
+    session_policy: new_session
+  on_environment:
+    transition: ai-environment
+  on_blocked:
+    transition: terminal-blocked
+- id: ai-environment
+  title: Исправить разрешённое тестовое окружение
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-intake
+    path: binding.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-triage
+    path: triage.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |2
+
+    Выполни attached skills. Постоянные артефакты пишутся в binding.change_dir; run artifacts — в каталог текущей попытки HG SDLC. Файлы каталога доступны через hgpdlc-v2 catalog-root.
+    Соблюдай границы полномочий. Учти runtime rework_instruction; не переписывай согласованные решения без возврата через нужный gate.
+    Заверши hgpdlc-v2 ai-summary --node ai-environment --route <route> --action "фактическое действие". Разрешённые route: on_success, on_blocked.
+  skill_refs:
+  - pdlc-environment@2.0
+  - pdlc-contracts@2.0
+  - pdlc-authority@2.0
+  - pdlc-e2e-evidence@2.0
+  - pdlc-native-artifacts@2.0
+  - pdlc-traceability@2.0
+  produced_artifacts:
+  - scope: run
+    path: environment-report.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-e2e-author
+    max_loop_count: 8
+  on_blocked:
+    transition: terminal-blocked
+- id: terminal-verified
+  title: Verified — не merged, не released, effect not measured
+  type: terminal
+  execution_context: []
+  produced_artifacts: []
+  expected_mutations: []
+- id: terminal-blocked
+  title: Blocked — результат не принят
+  type: terminal
+  execution_context: []
+  produced_artifacts: []
+  expected_mutations: []

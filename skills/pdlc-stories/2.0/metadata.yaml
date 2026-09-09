@@ -1,0 +1,20 @@
+entity_type: skill
+id: pdlc-stories
+version: '2.0'
+canonical_name: pdlc-stories@2.0
+display_name: BMAD epics и stories
+description: BMAD epics и stories
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-stories/2.0
+skill_kind: analysis
+checksum: 554360c3d892e222262f8ee0d982d3c1a6e0f93c395904154a5d6020fc1f40ed

@@ -1,0 +1,20 @@
+entity_type: skill
+id: pdlc-architecture
+version: '2.0'
+canonical_name: pdlc-architecture@2.0
+display_name: Архитектура по PRD
+description: Архитектура по PRD
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-architecture/2.0
+skill_kind: analysis
+checksum: 3926f6fbc4410b00b0458a2ec80ff12abbbf52b3cf22fd73217812af20e80bf2

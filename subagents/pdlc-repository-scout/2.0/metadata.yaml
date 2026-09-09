@@ -1,0 +1,21 @@
+entity_type: subagent
+id: pdlc-repository-scout
+version: '2.0'
+canonical_name: pdlc-repository-scout@2.0
+display_name: Исследователь репозиториев
+description: Исследователь репозиториев
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/pdlc-repository-scout/2.0
+subagent_kind: specialist
+definition_file: pdlc-repository-scout.md
+checksum: ac077a227f5f6d804d7070816685773a22a7d10f2f854bd37fc44be309298625

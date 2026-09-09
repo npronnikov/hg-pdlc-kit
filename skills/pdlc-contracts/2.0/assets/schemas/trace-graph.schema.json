@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:hg-pdlc:2.0:trace-graph",
+  "title": "trace-graph",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "2.0"
+    },
+    "change_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^(INT|HYP|BR|AC|ADR|FR|NFR|CONTRACT|STORY|CODE|E2E|CHECK)-[A-Za-z0-9][A-Za-z0-9_.-]*$"
+          },
+          "kind": {
+            "enum": [
+              "INT",
+              "HYP",
+              "BR",
+              "AC",
+              "ADR",
+              "FR",
+              "NFR",
+              "CONTRACT",
+              "STORY",
+              "CODE",
+              "E2E",
+              "CHECK"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scope": {
+            "enum": [
+              "in",
+              "out"
+            ]
+          },
+          "owner_stage": {
+            "type": "string",
+            "minLength": 1
+          },
+          "artifact": {
+            "type": "object",
+            "properties": {
+              "repo": {
+                "type": "string",
+                "minLength": 1
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "anchor": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "repo",
+              "path",
+              "anchor"
+            ],
+            "additionalProperties": false
+          },
+          "origin": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "confirmed",
+                  "observed",
+                  "proposed",
+                  "inferred"
+                ]
+              },
+              "sources": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "reference": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "revision": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "reference",
+                    "revision"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "kind",
+              "sources"
+            ],
+            "additionalProperties": false
+          },
+          "verification_method": {
+            "enum": [
+              "e2e",
+              "performance",
+              "security",
+              "static",
+              "inspection"
+            ]
+          },
+          "supersedes": {
+            "type": "string",
+            "pattern": "^(INT|HYP|BR|AC|ADR|FR|NFR|CONTRACT|STORY|CODE|E2E|CHECK)-[A-Za-z0-9][A-Za-z0-9_.-]*$"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "revision",
+          "title",
+          "scope",
+          "owner_stage",
+          "artifact",
+          "origin"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "pattern": "^(INT|HYP|BR|AC|ADR|FR|NFR|CONTRACT|STORY|CODE|E2E|CHECK)-[A-Za-z0-9][A-Za-z0-9_.-]*$"
+          },
+          "to": {
+            "type": "string",
+            "pattern": "^(INT|HYP|BR|AC|ADR|FR|NFR|CONTRACT|STORY|CODE|E2E|CHECK)-[A-Za-z0-9][A-Za-z0-9_.-]*$"
+          },
+          "relation": {
+            "enum": [
+              "motivates",
+              "drives",
+              "accepted_by",
+              "informs",
+              "constrains",
+              "refined_by",
+              "specifies",
+              "planned_as",
+              "implemented_by",
+              "tested_by",
+              "verified_by"
+            ]
+          },
+          "from_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "to_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "relation",
+          "from_revision",
+          "to_revision"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "schema_version",
+    "change_id",
+    "entities",
+    "links"
+  ],
+  "additionalProperties": false
+}

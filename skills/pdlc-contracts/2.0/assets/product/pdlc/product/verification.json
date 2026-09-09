@@ -1,0 +1,20 @@
+{
+  "schema_version": "2.0",
+  "configured": false,
+  "boundary": {
+    "kind": "browser",
+    "description": "Укажите реальную границу пользовательского пути; внутренние компоненты не подменяются",
+    "external_doubles": []
+  },
+  "checks": {
+    "argv": [],
+    "cwd": ".",
+    "timeout_seconds": 600
+  },
+  "e2e": {
+    "argv": [],
+    "cwd": ".",
+    "timeout_seconds": 900
+  },
+  "notes": "Настраивается до readiness. Пустые команды блокируют flow. Harness пишет junit.xml в PDLC_EVIDENCE_DIR и сам завершает/очищает тестовое окружение."
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": "2.0",
+  "boundary": "browser",
+  "tests": [
+    {
+      "id": "E2E-example-001",
+      "kind": "e2e",
+      "priority": "P0",
+      "requirements": [
+        "FR-example-001"
+      ],
+      "acceptance": [
+        "AC-example-001"
+      ],
+      "given": "Состояние/акторы/данные",
+      "when": "Действие через публичный пользовательский вход",
+      "then": [
+        "Наблюдаемый результат",
+        "Подтверждение сохранения/ошибки"
+      ],
+      "data_strategy": "Изолированная фикстура",
+      "external_doubles": [],
+      "mandatory": true
+    }
+  ]
+}

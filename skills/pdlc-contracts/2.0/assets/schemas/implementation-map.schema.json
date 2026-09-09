@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:hg-pdlc:2.0:implementation-map",
+  "title": "implementation-map",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "2.0"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^(INT|HYP|BR|AC|ADR|FR|NFR|CONTRACT|STORY|CODE|E2E|CHECK)-[A-Za-z0-9][A-Za-z0-9_.-]*$"
+          },
+          "story": {
+            "type": "string",
+            "pattern": "^(INT|HYP|BR|AC|ADR|FR|NFR|CONTRACT|STORY|CODE|E2E|CHECK)-[A-Za-z0-9][A-Za-z0-9_.-]*$"
+          },
+          "repo": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "symbol": {
+            "type": "string",
+            "minLength": 1
+          },
+          "action": {
+            "enum": [
+              "create",
+              "modify",
+              "delete"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "story",
+          "repo",
+          "path",
+          "symbol",
+          "action"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "test_bindings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "test_id": {
+            "type": "string",
+            "pattern": "^(INT|HYP|BR|AC|ADR|FR|NFR|CONTRACT|STORY|CODE|E2E|CHECK)-[A-Za-z0-9][A-Za-z0-9_.-]*$"
+          },
+          "repo": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "selector": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "test_id",
+          "repo",
+          "path",
+          "selector"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "items",
+    "test_bindings"
+  ],
+  "additionalProperties": false
+}

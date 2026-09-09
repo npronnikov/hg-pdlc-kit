@@ -1,0 +1,20 @@
+entity_type: skill
+id: pdlc-prd-review
+version: '2.0'
+canonical_name: pdlc-prd-review@2.0
+display_name: Независимая проверка PRD
+description: Независимая проверка PRD
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-prd-review/2.0
+skill_kind: analysis
+checksum: 445b6aad910d7ca67468d04228e77fe39b1f6e030791fa5de7e37160088088a2

@@ -1,0 +1,20 @@
+entity_type: skill
+id: pdlc-contracts
+version: '2.0'
+canonical_name: pdlc-contracts@2.0
+display_name: Общие форматы и контракты
+description: Общие форматы и контракты
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-contracts/2.0
+skill_kind: analysis
+checksum: 0613a078691ddbb9a39834ce362b48e3353f334715311b00939a0acd24ec8648

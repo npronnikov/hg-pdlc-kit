@@ -1,0 +1,20 @@
+entity_type: skill
+id: pdlc-acceptance
+version: '2.0'
+canonical_name: pdlc-acceptance@2.0
+display_name: Приёмка по доказательствам
+description: Приёмка по доказательствам
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-acceptance/2.0
+skill_kind: analysis
+checksum: 77aa91134fa5c647af3dc031a7fbab914b8bd7696d42cee63848c5782e680f7d

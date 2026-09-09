@@ -1,0 +1,20 @@
+entity_type: skill
+id: pdlc-correct-course
+version: '2.0'
+canonical_name: pdlc-correct-course@2.0
+display_name: Возврат в источник ошибки
+description: Возврат в источник ошибки
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-correct-course/2.0
+skill_kind: analysis
+checksum: d443d29a58767c7e1a13ea1ab1268fed739c0d9083fd0051575fa7e8372b1ae9

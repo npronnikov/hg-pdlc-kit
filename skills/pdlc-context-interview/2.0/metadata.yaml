@@ -1,0 +1,20 @@
+entity_type: skill
+id: pdlc-context-interview
+version: '2.0'
+canonical_name: pdlc-context-interview@2.0
+display_name: Анализ до интервью
+description: Анализ до интервью
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-context-interview/2.0
+skill_kind: analysis
+checksum: 8e4b2ca2e84e843c95429de1edda26fb509bfff7f726214b110ddde69a158983

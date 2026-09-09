@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:hg-pdlc:2.0:binding",
+  "title": "binding",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "2.0"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "change_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "change_dir": {
+      "type": "string",
+      "pattern": "^pdlc/changes/[A-Za-z0-9][A-Za-z0-9_-]*$"
+    },
+    "mode": {
+      "enum": [
+        "auto",
+        "brownfield",
+        "greenfield"
+      ]
+    },
+    "kind": {
+      "enum": [
+        "feature",
+        "baseline"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "change_id",
+    "change_dir",
+    "mode",
+    "kind"
+  ],
+  "additionalProperties": false
+}

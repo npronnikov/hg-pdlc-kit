@@ -1,0 +1,21 @@
+entity_type: subagent
+id: pdlc-implementer
+version: '2.0'
+canonical_name: pdlc-implementer@2.0
+display_name: Разработчик отдельной story
+description: Разработчик отдельной story
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/pdlc-implementer/2.0
+subagent_kind: specialist
+definition_file: pdlc-implementer.md
+checksum: 1b604988933c1f3f221620c00c0109dec710a295763ec1277367870a9d5e381e

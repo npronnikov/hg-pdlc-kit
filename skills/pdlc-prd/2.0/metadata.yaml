@@ -1,0 +1,20 @@
+entity_type: skill
+id: pdlc-prd
+version: '2.0'
+canonical_name: pdlc-prd@2.0
+display_name: PRD и гипотеза
+description: PRD и гипотеза
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-prd/2.0
+skill_kind: analysis
+checksum: cbecdc5d348e76d16cc67dff87e2bb612f9c2cb8787b89532cb6c17245d62de7

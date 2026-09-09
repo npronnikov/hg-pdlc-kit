@@ -1,0 +1,22 @@
+entity_type: flow
+id: pdlc-bmad-bootstrap
+version: '2.0'
+canonical_name: pdlc-bmad-bootstrap@2.0
+display_name: 'BMAD brownfield: восстановление базы знаний'
+description: Observed behavior и confirmed requirements раздельно; независимый audit
+  и native human gate.
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- bmad
+- traceability
+- native-artifacts
+flow_kind: analysis
+risk_level: medium
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: flows/pdlc-bmad-bootstrap/2.0
+checksum: 34b4f61a33af5f2f9b524599365999c3768032cfc9437c1882a04602f8423366

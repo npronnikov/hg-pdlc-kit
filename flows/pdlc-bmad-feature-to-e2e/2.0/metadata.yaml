@@ -1,0 +1,22 @@
+entity_type: flow
+id: pdlc-bmad-feature-to-e2e
+version: '2.0'
+canonical_name: pdlc-bmad-feature-to-e2e@2.0
+display_name: 'BMAD: PRD → архитектура → SRS → stories → код → E2E'
+description: Адаптация BMM + TEA к HG SDLC. Полная traceability, native run artifacts,
+  продуктовые документы в pdlc/. Без release/outcome.
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- bmad
+- traceability
+- native-artifacts
+flow_kind: delivery
+risk_level: medium
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: flows/pdlc-bmad-feature-to-e2e/2.0
+checksum: ed95ca99fe4f56571cb4fd6bac449a78d06c35f7b7ebc3d60f7d34bec7c3e54a

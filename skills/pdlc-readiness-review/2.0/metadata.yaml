@@ -1,0 +1,20 @@
+entity_type: skill
+id: pdlc-readiness-review
+version: '2.0'
+canonical_name: pdlc-readiness-review@2.0
+display_name: Readiness и согласованность дизайна
+description: Readiness и согласованность дизайна
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-readiness-review/2.0
+skill_kind: analysis
+checksum: af28c8b5e39c316074a757e40d6054f294b19979d4fec86c8ec76e9ee773175e

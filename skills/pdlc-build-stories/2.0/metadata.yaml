@@ -1,0 +1,20 @@
+entity_type: skill
+id: pdlc-build-stories
+version: '2.0'
+canonical_name: pdlc-build-stories@2.0
+display_name: Реализация по stories
+description: Реализация по stories
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-build-stories/2.0
+skill_kind: analysis
+checksum: a83839bc66fcacc1f31dfecd1712adcc58300a229d5406e07166e59a08f37ec9

@@ -1,0 +1,20 @@
+entity_type: skill
+id: pdlc-test-design
+version: '2.0'
+canonical_name: pdlc-test-design@2.0
+display_name: Тестовая модель до кода
+description: Тестовая модель до кода
+coding_agent: qwen
+team_code: PDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-test-design/2.0
+skill_kind: analysis
+checksum: 30faeeaaa2dde74fd0dfe902ddf0d13f8de5908afaeae40dc6f0a65f938297f9
