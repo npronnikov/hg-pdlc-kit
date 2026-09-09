@@ -1,0 +1,26 @@
+{
+  "kind": "human-form",
+  "version": "1",
+  "title": "Решения по фиче после анализа монорепы",
+  "fields": [
+    {
+      "id": "target_role",
+      "type": "radio",
+      "label": "Кому доступна новая возможность?",
+      "required": true,
+      "options": [
+        "Только владелец объекта",
+        "Участники команды",
+        "Иной вариант: уточнить"
+      ],
+      "value": null
+    },
+    {
+      "id": "acceptance_rules",
+      "type": "textarea",
+      "label": "Каковы обязательные ограничения и ожидаемые негативные результаты?",
+      "required": true,
+      "value": null
+    }
+  ]
+}

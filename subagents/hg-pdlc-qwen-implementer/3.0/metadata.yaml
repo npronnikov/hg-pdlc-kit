@@ -1,0 +1,22 @@
+entity_type: subagent
+id: hg-pdlc-qwen-implementer
+version: '3.0'
+canonical_name: hg-pdlc-qwen-implementer@3.0
+display_name: Разработчик
+description: Реализуй только явно назначенные TASK и файлы в одном checkout. Не редактировать upstream спецификации
+  и ожидания тестов.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/hg-pdlc-qwen-implementer/3.0
+checksum: 0868d08518f4298803c8094ce5711e2520ea50c53ff18297e548bc6e831be9cc
+definition_file: hg-pdlc-qwen-implementer.md

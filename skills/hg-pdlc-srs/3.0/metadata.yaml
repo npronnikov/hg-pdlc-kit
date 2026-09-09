@@ -1,0 +1,21 @@
+entity_type: skill
+id: hg-pdlc-srs
+version: '3.0'
+canonical_name: hg-pdlc-srs@3.0
+display_name: Системная спецификация SRS + EARS
+description: Переводит PRD и архитектуру в проверяемые системные требования, API, данные, права и NFR.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/hg-pdlc-srs/3.0
+checksum: 2bcb1b6a5bc50928079b46e54b1df22ce24b3cb5939589e439af122aafecf062
+skill_kind: analysis

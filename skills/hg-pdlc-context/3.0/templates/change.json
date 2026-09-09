@@ -1,0 +1,10 @@
+{
+  "change_id": "CHG-example-000001",
+  "title": "REPLACE",
+  "mode": "brownfield",
+  "base_commit": "REPLACE_WITH_ACTUAL",
+  "status": "draft",
+  "source_request": "intent.md",
+  "scope": "monorepo",
+  "blocking_unknowns": []
+}

@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "implementation-plan",
+  "type": "object",
+  "properties": {
+    "change_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9-]*$"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Za-z0-9-]*$"
+            }
+          },
+          "system_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Za-z0-9-]*$"
+            },
+            "minItems": 1
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          },
+          "action": {
+            "type": "string",
+            "minLength": 1
+          },
+          "done_when": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "depends_on",
+          "system_ids",
+          "files",
+          "action",
+          "done_when"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "build_command": {
+      "type": "string",
+      "minLength": 1
+    },
+    "e2e_command": {
+      "type": "string",
+      "minLength": 1
+    },
+    "protected_resources": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "required": [
+    "change_id",
+    "tasks",
+    "build_command",
+    "e2e_command",
+    "protected_resources"
+  ],
+  "additionalProperties": false
+}

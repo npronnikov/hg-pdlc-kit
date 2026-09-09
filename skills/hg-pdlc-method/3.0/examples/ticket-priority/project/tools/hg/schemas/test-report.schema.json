@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "runner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "started_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "finished_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "environment": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "isolated-local",
+            "isolated-ci"
+          ]
+        },
+        "real_components": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "external_simulators": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "real_components",
+        "external_simulators"
+      ],
+      "additionalProperties": false
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9-]*$"
+          },
+          "status": {
+            "enum": [
+              "passed",
+              "failed",
+              "skipped",
+              "blocked",
+              "flaky"
+            ]
+          },
+          "attempts": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "duration_ms": {
+            "type": "number",
+            "minimum": 0
+          },
+          "assertions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          },
+          "chain": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "attempts",
+          "duration_ms",
+          "assertions",
+          "chain"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "runner",
+    "started_at",
+    "finished_at",
+    "environment",
+    "cases"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,231 @@
+{
+  "change_id": "CHG-ticket-priority-a1b2c3",
+  "requirements": [
+    {
+      "id": "SR-001",
+      "statement": "Когда alice меняет priority на high, система должна обеспечить: 200; priority=high/version=2; последующий GET возвращает то же.",
+      "business_ids": [
+        "BR-001"
+      ],
+      "acceptance_ids": [
+        "AC-001"
+      ],
+      "component_ids": [
+        "CMP-api",
+        "CMP-store"
+      ],
+      "verification": "e2e",
+      "priority": "must",
+      "source_refs": [
+        {
+          "kind": "product-spec",
+          "path": "docs/changes/CHG-ticket-priority-a1b2c3/prd.md",
+          "revision": "DEMO-PRD-1",
+          "locator": "AC-001",
+          "confidence": "confirmed"
+        }
+      ]
+    },
+    {
+      "id": "SR-002",
+      "statement": "Когда сервис перезапускается на той же бд, система должна обеспечить: GET возвращает сохранённые priority и version.",
+      "business_ids": [
+        "BR-001"
+      ],
+      "acceptance_ids": [
+        "AC-002"
+      ],
+      "component_ids": [
+        "CMP-api",
+        "CMP-store"
+      ],
+      "verification": "e2e",
+      "priority": "must",
+      "source_refs": [
+        {
+          "kind": "product-spec",
+          "path": "docs/changes/CHG-ticket-priority-a1b2c3/prd.md",
+          "revision": "DEMO-PRD-1",
+          "locator": "AC-002",
+          "confidence": "confirmed"
+        }
+      ]
+    },
+    {
+      "id": "SR-003",
+      "statement": "Когда bob выполняет get/patch t-alice, система должна обеспечить: 404/not_found, тело заявки не раскрыто, данные не изменены.",
+      "business_ids": [
+        "BR-002"
+      ],
+      "acceptance_ids": [
+        "AC-003"
+      ],
+      "component_ids": [
+        "CMP-api",
+        "CMP-store"
+      ],
+      "verification": "e2e",
+      "priority": "must",
+      "source_refs": [
+        {
+          "kind": "product-spec",
+          "path": "docs/changes/CHG-ticket-priority-a1b2c3/prd.md",
+          "revision": "DEMO-PRD-1",
+          "locator": "AC-003",
+          "confidence": "confirmed"
+        }
+      ]
+    },
+    {
+      "id": "SR-004",
+      "statement": "Когда клиент выполняет patch, система должна обеспечить: 401/unauthorized и отсутствие изменения данных.",
+      "business_ids": [
+        "BR-002"
+      ],
+      "acceptance_ids": [
+        "AC-004"
+      ],
+      "component_ids": [
+        "CMP-api",
+        "CMP-store"
+      ],
+      "verification": "e2e",
+      "priority": "must",
+      "source_refs": [
+        {
+          "kind": "product-spec",
+          "path": "docs/changes/CHG-ticket-priority-a1b2c3/prd.md",
+          "revision": "DEMO-PRD-1",
+          "locator": "AC-004",
+          "confidence": "confirmed"
+        }
+      ]
+    },
+    {
+      "id": "SR-005",
+      "statement": "Когда patch с priority=urgent, система должна обеспечить: 400/invalid_priority, прежние priority/version сохранены.",
+      "business_ids": [
+        "BR-003"
+      ],
+      "acceptance_ids": [
+        "AC-005"
+      ],
+      "component_ids": [
+        "CMP-api",
+        "CMP-store"
+      ],
+      "verification": "e2e",
+      "priority": "must",
+      "source_refs": [
+        {
+          "kind": "product-spec",
+          "path": "docs/changes/CHG-ticket-priority-a1b2c3/prd.md",
+          "revision": "DEMO-PRD-1",
+          "locator": "AC-005",
+          "confidence": "confirmed"
+        }
+      ]
+    },
+    {
+      "id": "SR-006",
+      "statement": "Когда patch с broken json, missing/noninteger version либо неизвестным полем, система должна обеспечить: 400 с error для структуры/JSON, 415 для не-JSON content-type, 413 для тела >8192 bytes; состояние заявки не меняется.",
+      "business_ids": [
+        "BR-003"
+      ],
+      "acceptance_ids": [
+        "AC-006"
+      ],
+      "component_ids": [
+        "CMP-api",
+        "CMP-store"
+      ],
+      "verification": "e2e",
+      "priority": "must",
+      "source_refs": [
+        {
+          "kind": "product-spec",
+          "path": "docs/changes/CHG-ticket-priority-a1b2c3/prd.md",
+          "revision": "DEMO-PRD-1",
+          "locator": "AC-006",
+          "confidence": "confirmed"
+        }
+      ]
+    },
+    {
+      "id": "SR-007",
+      "statement": "Когда одновременно отправляют разные приоритеты с expectedversion=1, система должна обеспечить: Ровно один 200 и один 409; версия становится 2, победившее значение не потеряно.",
+      "business_ids": [
+        "BR-004"
+      ],
+      "acceptance_ids": [
+        "AC-007"
+      ],
+      "component_ids": [
+        "CMP-api",
+        "CMP-store"
+      ],
+      "verification": "e2e",
+      "priority": "must",
+      "source_refs": [
+        {
+          "kind": "product-spec",
+          "path": "docs/changes/CHG-ticket-priority-a1b2c3/prd.md",
+          "revision": "DEMO-PRD-1",
+          "locator": "AC-007",
+          "confidence": "confirmed"
+        }
+      ]
+    },
+    {
+      "id": "SR-008",
+      "statement": "Когда запускается обновлённое приложение, система должна обеспечить: id/title сохранены; GET содержит priority=normal, version=1.",
+      "business_ids": [
+        "BR-005"
+      ],
+      "acceptance_ids": [
+        "AC-008"
+      ],
+      "component_ids": [
+        "CMP-api",
+        "CMP-store"
+      ],
+      "verification": "e2e",
+      "priority": "must",
+      "source_refs": [
+        {
+          "kind": "product-spec",
+          "path": "docs/changes/CHG-ticket-priority-a1b2c3/prd.md",
+          "revision": "DEMO-PRD-1",
+          "locator": "AC-008",
+          "confidence": "confirmed"
+        }
+      ]
+    },
+    {
+      "id": "SR-009",
+      "statement": "Когда авторизованный пользователь меняет приоритет, система должна обеспечить: 404/not_found как для чужой заявки; существующие записи не изменены.",
+      "business_ids": [
+        "BR-002"
+      ],
+      "acceptance_ids": [
+        "AC-009"
+      ],
+      "component_ids": [
+        "CMP-api",
+        "CMP-store"
+      ],
+      "verification": "e2e",
+      "priority": "must",
+      "source_refs": [
+        {
+          "kind": "product-spec",
+          "path": "docs/changes/CHG-ticket-priority-a1b2c3/prd.md",
+          "revision": "DEMO-PRD-1",
+          "locator": "AC-009",
+          "confidence": "confirmed"
+        }
+      ]
+    }
+  ],
+  "nfr": []
+}

@@ -1,0 +1,8 @@
+{
+  "origin": "controlled local negative test; not an HG run",
+  "before_source_sha256": "dba5094cb88f76772630a66a10a98207c848d8249da463286a9cfcbc27f7dcf2",
+  "mutated_source_sha256": "f8c0c35b13214722a512509209a511c71aa3541a9989461c19fa0deca384515e",
+  "mutation": "version predicate replaced with tautological positive-version check",
+  "expected_failed_case": "E2E-007",
+  "actual_exit_code": 1
+}

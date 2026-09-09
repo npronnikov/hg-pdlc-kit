@@ -1,0 +1,22 @@
+entity_type: subagent
+id: hg-pdlc-qwen-architect
+version: '3.0'
+canonical_name: hg-pdlc-qwen-architect@3.0
+display_name: Архитектор
+description: Проверь границы C4, компоненты, инварианты, alternatives ADR, тестируемость, совместимость и риски. Не
+  менять PRD.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/hg-pdlc-qwen-architect/3.0
+checksum: 267b30f402941c7111fd1dd1575d1d6c96c1cec6ac143c22a828cc24b0fe7453
+definition_file: hg-pdlc-qwen-architect.md

@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "test-model",
+  "type": "object",
+  "properties": {
+    "change_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9-]*$"
+          },
+          "acceptance_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Za-z0-9-]*$"
+            },
+            "minItems": 1
+          },
+          "system_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Za-z0-9-]*$"
+            },
+            "minItems": 1
+          },
+          "kind": {
+            "enum": [
+              "browser-e2e",
+              "api-e2e"
+            ]
+          },
+          "priority": {
+            "enum": [
+              "must",
+              "should",
+              "could"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "chain": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          },
+          "data_setup": {
+            "type": "string",
+            "minLength": 1
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          },
+          "oracle": {
+            "type": "string",
+            "minLength": 1
+          },
+          "cleanup": {
+            "type": "string",
+            "minLength": 1
+          },
+          "test_file": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "acceptance_ids",
+          "system_ids",
+          "kind",
+          "priority",
+          "required",
+          "chain",
+          "data_setup",
+          "steps",
+          "oracle",
+          "cleanup",
+          "test_file"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "change_id",
+    "scenarios"
+  ],
+  "additionalProperties": false
+}

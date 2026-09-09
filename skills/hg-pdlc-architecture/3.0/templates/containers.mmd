@@ -1,0 +1,8 @@
+flowchart LR
+  client["Person / внешний клиент"]
+  subgraph system["Software System boundary — один продукт"]
+    api["Container: API — ответственность, технология"]
+    db[("Container: Data store — данные, технология")]
+    api -->|"storage interface"| db
+  end
+  client -->|"HTTP / контракт"| api

@@ -1,0 +1,21 @@
+entity_type: skill
+id: hg-pdlc-architecture
+version: '3.0'
+canonical_name: hg-pdlc-architecture@3.0
+display_name: 'Архитектура: arc42-lite + C4 + ADR'
+description: 'Проектирует архитектурный delta после PRD: границы, компоненты, контракты, инварианты и решения.'
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/hg-pdlc-architecture/3.0
+checksum: f15c818dc16d3aa5aa6882bda2e6eee3f567b429c5de42d9f7c7e54322126daa
+skill_kind: analysis

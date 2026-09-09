@@ -1,0 +1,23 @@
+entity_type: flow
+id: hg-pdlc-baseline-recovery
+version: '3.0'
+canonical_name: hg-pdlc-baseline-recovery@3.0
+display_name: 'Монорепа: восстановить базу business / architecture / SRS / tests'
+description: Документационный flow с теми же сущностями/форматами и одним human gate; не меняет приложение и не имитирует
+  E2E acceptance.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: flows/hg-pdlc-baseline-recovery/3.0
+checksum: d58e3acfa49362d1a0fa63f4e79e3ed7a385b3b2fe6a97cb23163206e4ea69b4
+flow_kind: analysis
+risk_level: medium

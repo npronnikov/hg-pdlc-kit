@@ -1,0 +1,9 @@
+{
+  "change_id": "CHG-ticket-priority-a1b2c3",
+  "title": "Приоритет собственной заявки",
+  "mode": "brownfield",
+  "base_commit": "e28dbb659fa5a86562e8661f5ac9ea6aae88acc1",
+  "status": "e2e_verified_not_released",
+  "scope": "monorepo",
+  "example_origin": "prepared narrative fixtures; commands actually executed"
+}

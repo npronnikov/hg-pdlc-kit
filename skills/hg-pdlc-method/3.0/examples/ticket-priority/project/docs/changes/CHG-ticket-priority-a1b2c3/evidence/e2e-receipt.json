@@ -1,0 +1,16 @@
+{
+  "node_id": "command-e2e",
+  "attempt": 1,
+  "stage": "e2e",
+  "passed": true,
+  "exit_code": 0,
+  "started_at": "2026-09-09T16:17:04.286Z",
+  "finished_at": "2026-09-09T16:17:08.268Z",
+  "source_hash": "0755c486d642fd3741190f64765ce715790696249eeda7616f07c5dfa2a054af",
+  "contract_hash": "33dd418ad5877ea86bed544227ce9f3822884246409fb645d5639d1ba02c3792",
+  "before_source_hash": "0755c486d642fd3741190f64765ce715790696249eeda7616f07c5dfa2a054af",
+  "before_contract_hash": "33dd418ad5877ea86bed544227ce9f3822884246409fb645d5639d1ba02c3792",
+  "log_sha256": "f5c8a56f2764cfe661e4878173ae2396cfb60ac87e452232e495640a9f9b846e",
+  "report_sha256": "79ff63ccc69af5a9fed6f644fb9c5735232ff2a7a45e387cfc7d5b34a2443b6f",
+  "problems": []
+}

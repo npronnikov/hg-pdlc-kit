@@ -1,0 +1,29 @@
+{
+  "status": "e2e_verified_not_released",
+  "scope": "monorepo",
+  "changes": [
+    {
+      "change_id": "CHG-ticket-priority-a1b2c3",
+      "status": "e2e_verified_not_released",
+      "verification": "docs/changes/CHG-ticket-priority-a1b2c3/verification.md"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "CAP-ticket-read",
+      "state": "retained",
+      "source": "docs/product/baseline.md"
+    },
+    {
+      "id": "CAP-ticket-priority",
+      "state": "implemented_not_released",
+      "source": "docs/changes/CHG-ticket-priority-a1b2c3/prd.md"
+    }
+  ],
+  "layers": {
+    "business": "docs/product/business/current.md",
+    "architecture": "docs/product/architecture/current.md",
+    "system": "docs/product/system/current.md",
+    "quality": "docs/product/quality/current.md"
+  }
+}

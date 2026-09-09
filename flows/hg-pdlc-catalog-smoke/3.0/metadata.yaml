@@ -1,0 +1,23 @@
+entity_type: flow
+id: hg-pdlc-catalog-smoke
+version: '3.0'
+canonical_name: hg-pdlc-catalog-smoke@3.0
+display_name: 'Проверка каталога: resources, subagent, scope и human rework'
+description: 'Проверка на живом HG перед delivery: чтение вложенных ресурсов, native Qwen subagent, project/run, два
+  режима Rework.'
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: flows/hg-pdlc-catalog-smoke/3.0
+checksum: 33cedcdfeed48fa1051540b1136afdf1ef4e1625190a7fc98478c0a7df9b890f
+flow_kind: analysis
+risk_level: low

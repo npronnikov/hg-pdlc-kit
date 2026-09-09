@@ -1,0 +1,191 @@
+{
+  "change_id": "CHG-ticket-priority-a1b2c3",
+  "business_requirements": [
+    {
+      "id": "BR-001",
+      "statement": "Владелец может задать low/normal/high для своей заявки; результат сохраняется.",
+      "rationale": "Потребность и ограничение из пакетного интервью",
+      "priority": "must",
+      "source_refs": [
+        {
+          "kind": "human-gate",
+          "path": "human-interview/questions.form.json",
+          "revision": "DEMO-FIXTURE-1",
+          "locator": "allowed_actor, priority_values",
+          "confidence": "confirmed"
+        }
+      ],
+      "acceptance_ids": [
+        "AC-001",
+        "AC-002"
+      ]
+    },
+    {
+      "id": "BR-002",
+      "statement": "Неавторизованный пользователь и другой владелец не получают доступ к изменению или содержимому заявки.",
+      "rationale": "Потребность и ограничение из пакетного интервью",
+      "priority": "must",
+      "source_refs": [
+        {
+          "kind": "human-gate",
+          "path": "human-interview/questions.form.json",
+          "revision": "DEMO-FIXTURE-1",
+          "locator": "allowed_actor",
+          "confidence": "confirmed"
+        }
+      ],
+      "acceptance_ids": [
+        "AC-003",
+        "AC-004",
+        "AC-009"
+      ]
+    },
+    {
+      "id": "BR-003",
+      "statement": "Некорректный запрос не меняет заявку и возвращает объяснимую ошибку.",
+      "rationale": "Потребность и ограничение из пакетного интервью",
+      "priority": "must",
+      "source_refs": [
+        {
+          "kind": "human-gate",
+          "path": "human-interview/questions.form.json",
+          "revision": "DEMO-FIXTURE-1",
+          "locator": "priority_values",
+          "confidence": "confirmed"
+        }
+      ],
+      "acceptance_ids": [
+        "AC-005",
+        "AC-006"
+      ]
+    },
+    {
+      "id": "BR-004",
+      "statement": "Конкурирующая запись со старой версией не перезаписывает победившее изменение.",
+      "rationale": "Потребность и ограничение из пакетного интервью",
+      "priority": "must",
+      "source_refs": [
+        {
+          "kind": "human-gate",
+          "path": "human-interview/questions.form.json",
+          "revision": "DEMO-FIXTURE-1",
+          "locator": "version_conflict",
+          "confidence": "confirmed"
+        }
+      ],
+      "acceptance_ids": [
+        "AC-007"
+      ]
+    },
+    {
+      "id": "BR-005",
+      "statement": "Существующие заявки и потребители id/title сохраняют совместимость; default приоритета normal.",
+      "rationale": "Потребность и ограничение из пакетного интервью",
+      "priority": "must",
+      "source_refs": [
+        {
+          "kind": "human-gate",
+          "path": "human-interview/questions.form.json",
+          "revision": "DEMO-FIXTURE-1",
+          "locator": "legacy_behavior",
+          "confidence": "confirmed"
+        }
+      ],
+      "acceptance_ids": [
+        "AC-008"
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-001",
+      "business_ids": [
+        "BR-001"
+      ],
+      "given": "Заявка t-alice принадлежит alice, version=1",
+      "when": "alice меняет priority на high",
+      "then": "200; priority=high/version=2; последующий GET возвращает то же",
+      "negative_or_boundary": false
+    },
+    {
+      "id": "AC-002",
+      "business_ids": [
+        "BR-001"
+      ],
+      "given": "priority собственной заявки успешно изменён",
+      "when": "сервис перезапускается на той же БД",
+      "then": "GET возвращает сохранённые priority и version",
+      "negative_or_boundary": false
+    },
+    {
+      "id": "AC-003",
+      "business_ids": [
+        "BR-002"
+      ],
+      "given": "Заявка принадлежит другому пользователю",
+      "when": "bob выполняет GET/PATCH t-alice",
+      "then": "404/not_found, тело заявки не раскрыто, данные не изменены",
+      "negative_or_boundary": true
+    },
+    {
+      "id": "AC-004",
+      "business_ids": [
+        "BR-002"
+      ],
+      "given": "Нет действительного token",
+      "when": "клиент выполняет PATCH",
+      "then": "401/unauthorized и отсутствие изменения данных",
+      "negative_or_boundary": true
+    },
+    {
+      "id": "AC-005",
+      "business_ids": [
+        "BR-003"
+      ],
+      "given": "Валидный владелец и версия",
+      "when": "PATCH с priority=urgent",
+      "then": "400/invalid_priority, прежние priority/version сохранены",
+      "negative_or_boundary": true
+    },
+    {
+      "id": "AC-006",
+      "business_ids": [
+        "BR-003"
+      ],
+      "given": "Валидный владелец",
+      "when": "PATCH с broken JSON, missing/noninteger version либо неизвестным полем",
+      "then": "400 с error для структуры/JSON, 415 для не-JSON content-type, 413 для тела >8192 bytes; состояние заявки не меняется",
+      "negative_or_boundary": true
+    },
+    {
+      "id": "AC-007",
+      "business_ids": [
+        "BR-004"
+      ],
+      "given": "Два клиента прочитали version=1",
+      "when": "одновременно отправляют разные приоритеты с expectedVersion=1",
+      "then": "Ровно один 200 и один 409; версия становится 2, победившее значение не потеряно",
+      "negative_or_boundary": true
+    },
+    {
+      "id": "AC-008",
+      "business_ids": [
+        "BR-005"
+      ],
+      "given": "Существующая таблица без priority/version",
+      "when": "запускается обновлённое приложение",
+      "then": "id/title сохранены; GET содержит priority=normal, version=1",
+      "negative_or_boundary": false
+    },
+    {
+      "id": "AC-009",
+      "business_ids": [
+        "BR-002"
+      ],
+      "given": "Запрошен отсутствующий id",
+      "when": "авторизованный пользователь меняет приоритет",
+      "then": "404/not_found как для чужой заявки; существующие записи не изменены",
+      "negative_or_boundary": true
+    }
+  ]
+}

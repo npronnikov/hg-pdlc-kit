@@ -1,0 +1,88 @@
+{
+  "change_id": "CHG-ticket-priority-a1b2c3",
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "depends_on": [],
+      "system_ids": [
+        "SR-008"
+      ],
+      "files": [
+        "apps/api/server.mjs"
+      ],
+      "action": "Аддитивная миграция priority/version с сохранением legacy records",
+      "done_when": "Legacy E2E-008 passed"
+    },
+    {
+      "id": "TASK-002",
+      "depends_on": [
+        "TASK-001"
+      ],
+      "system_ids": [
+        "SR-001",
+        "SR-002",
+        "SR-003",
+        "SR-004",
+        "SR-007",
+        "SR-009"
+      ],
+      "files": [
+        "apps/api/server.mjs"
+      ],
+      "action": "HTTP authorization, read/write, persisted optimistic version update",
+      "done_when": "Relevant public-boundary E2E passed"
+    },
+    {
+      "id": "TASK-003",
+      "depends_on": [
+        "TASK-002"
+      ],
+      "system_ids": [
+        "SR-005",
+        "SR-006"
+      ],
+      "files": [
+        "apps/api/priority.mjs",
+        "tests/unit/priority.test.mjs"
+      ],
+      "action": "Валидация enum/version/JSON/unknown fields и unit checks",
+      "done_when": "Unit checks and E2E-005/006 passed"
+    },
+    {
+      "id": "TASK-004",
+      "depends_on": [
+        "TASK-002",
+        "TASK-003"
+      ],
+      "system_ids": [
+        "SR-001",
+        "SR-002",
+        "SR-003",
+        "SR-004",
+        "SR-005",
+        "SR-006",
+        "SR-007",
+        "SR-008",
+        "SR-009"
+      ],
+      "files": [
+        "tests/e2e/ticket-priority.e2e.mjs",
+        "tools/hg/e2e.sh"
+      ],
+      "action": "Внешние HTTP E2E с реальным процессом и SQLite, reporter и cleanup",
+      "done_when": "All nine required IDs passed in fresh report"
+    }
+  ],
+  "build_command": "bash tools/hg/build.sh",
+  "e2e_command": "bash tools/hg/e2e.sh <fresh-run-report-path>",
+  "protected_resources": {
+    "tools/hg/verify.mjs": "3f8d4e59dbc81de55eef2fdc054a5a76d3171abfa4c869a5c7becfc72c610764",
+    "tools/hg/schemas/business.schema.json": "9e890f55589f2097b9da24e98f1e6271870093b675f8d8926f535cfd11791cd3",
+    "tools/hg/schemas/components.schema.json": "97977173011b452d75ac0a2d8d417ef53aa6a38e82a3a661d700325322b20078",
+    "tools/hg/schemas/implementation-plan.schema.json": "4b3b203d8e4955148809ddabd741ca48e10f944a9bee51578f8773b0cf6cda49",
+    "tools/hg/schemas/nfr-report.schema.json": "43e95890f8cb291ea527dd0f220c6997a952c8ed110240571d3b90dbd03b7099",
+    "tools/hg/schemas/system.schema.json": "0e14c8d8ab008e15cd3efc953aaff80a05f13b6d19f9ee34fc4f6a69d036db08",
+    "tools/hg/schemas/test-model.schema.json": "d6551bd7f4620ae2cfdd3b8fb4916f6fa55999937681cb8ee2ff2bd321ca439b",
+    "tools/hg/schemas/test-report.schema.json": "a3a82c225f5a0b7147e3e5f83af45f171684f373f1ba9ef9573ab639fb118f4f"
+  }
+}

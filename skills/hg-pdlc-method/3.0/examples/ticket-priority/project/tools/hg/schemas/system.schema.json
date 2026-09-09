@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "system",
+  "type": "object",
+  "properties": {
+    "change_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9-]*$"
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "business_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Za-z0-9-]*$"
+            },
+            "minItems": 1
+          },
+          "acceptance_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Za-z0-9-]*$"
+            },
+            "minItems": 1
+          },
+          "component_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Za-z0-9-]*$"
+            },
+            "minItems": 1
+          },
+          "verification": {
+            "enum": [
+              "e2e",
+              "integration",
+              "static",
+              "performance",
+              "security"
+            ]
+          },
+          "priority": {
+            "enum": [
+              "must",
+              "should",
+              "could"
+            ]
+          },
+          "source_refs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "repository",
+                    "product-spec",
+                    "human-gate",
+                    "derived"
+                  ]
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "locator": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "confidence": {
+                  "enum": [
+                    "observed",
+                    "inferred",
+                    "proposed",
+                    "confirmed"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "path",
+                "revision",
+                "locator",
+                "confidence"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "id",
+          "statement",
+          "business_ids",
+          "acceptance_ids",
+          "component_ids",
+          "verification",
+          "priority",
+          "source_refs"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "nfr": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9-]*$"
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "verification": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          },
+          "metric": {
+            "type": "string",
+            "minLength": 1
+          },
+          "operator": {
+            "enum": [
+              "<=",
+              ">=",
+              "=="
+            ]
+          },
+          "threshold": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "conditions": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "statement",
+          "verification",
+          "rationale",
+          "metric",
+          "operator",
+          "threshold",
+          "unit",
+          "conditions"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "change_id",
+    "requirements",
+    "nfr"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,54 @@
+{
+  "kind": "human-form",
+  "version": "1",
+  "title": "Приоритет заявки — решения ВП",
+  "fields": [
+    {
+      "id": "allowed_actor",
+      "type": "radio",
+      "label": "Кто меняет приоритет?",
+      "required": true,
+      "options": [
+        "Только владелец заявки",
+        "Любой сотрудник команды"
+      ],
+      "value": "Только владелец заявки"
+    },
+    {
+      "id": "priority_values",
+      "type": "radio",
+      "label": "Какие значения и default?",
+      "required": true,
+      "options": [
+        "low / normal / high; default normal",
+        "Только normal / high"
+      ],
+      "value": "low / normal / high; default normal"
+    },
+    {
+      "id": "version_conflict",
+      "type": "radio",
+      "label": "Как поступить при устаревшей версии?",
+      "required": true,
+      "options": [
+        "409 и повторное чтение пользователем",
+        "Последняя запись побеждает"
+      ],
+      "value": "409 и повторное чтение пользователем"
+    },
+    {
+      "id": "legacy_behavior",
+      "type": "textarea",
+      "label": "Совместимость существующих данных и scope UI?",
+      "required": true,
+      "value": "Существующие заявки получают normal, id/title сохраняются. Только API; UI, сортировка, bulk, уведомления вне scope."
+    },
+    {
+      "id": "success",
+      "type": "textarea",
+      "label": "Критерий результата и будущая метрика?",
+      "required": true,
+      "value": "Все согласованные AC проходят E2E. Гипотеза: владельцы начинают отмечать high для срочных заявок. Базовая доля и целевой эффект пока неизвестны; после выпуска потребуется отдельное измерение."
+    }
+  ]
+}

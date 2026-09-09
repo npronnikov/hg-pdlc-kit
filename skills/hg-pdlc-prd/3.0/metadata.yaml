@@ -1,0 +1,21 @@
+entity_type: skill
+id: hg-pdlc-prd
+version: '3.0'
+canonical_name: hg-pdlc-prd@3.0
+display_name: Бизнес-контракт PRD + BR/AC
+description: Формирует полный в согласованных границах PRD, решения ВП и атомарные бизнес-требования с приёмкой.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/hg-pdlc-prd/3.0
+checksum: 366c1b6f191589ba2798003f5255d2636a029e360361f7b47e3ec446ca3fe486
+skill_kind: analysis

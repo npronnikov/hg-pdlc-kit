@@ -1,0 +1,21 @@
+entity_type: subagent
+id: hg-pdlc-qwen-test-designer
+version: '3.0'
+canonical_name: hg-pdlc-qwen-test-designer@3.0
+display_name: Проектировщик тестов
+description: Построй/проверь независимые E2E oracle из AC/SR, negative/boundary, реальную цепочку и изоляцию.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/hg-pdlc-qwen-test-designer/3.0
+checksum: e18318f95eec806f22b1338db214a8241fabaec4a537523336a40c958db01c41
+definition_file: hg-pdlc-qwen-test-designer.md

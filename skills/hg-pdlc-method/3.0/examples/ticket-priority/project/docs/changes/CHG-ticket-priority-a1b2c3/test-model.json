@@ -1,0 +1,230 @@
+{
+  "change_id": "CHG-ticket-priority-a1b2c3",
+  "scenarios": [
+    {
+      "id": "E2E-001",
+      "acceptance_ids": [
+        "AC-001"
+      ],
+      "system_ids": [
+        "SR-001"
+      ],
+      "kind": "api-e2e",
+      "priority": "must",
+      "required": true,
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ],
+      "data_setup": "Независимая временная файловая SQLite с legacy таблицей и двумя владельцами; отдельный server child process",
+      "steps": [
+        "Заявка t-alice принадлежит alice, version=1",
+        "alice меняет priority на high"
+      ],
+      "oracle": "200; priority=high/version=2; последующий GET возвращает то же",
+      "cleanup": "SIGTERM server; дождаться завершения; удалить только свою mkdtemp fixture",
+      "test_file": "tests/e2e/ticket-priority.e2e.mjs"
+    },
+    {
+      "id": "E2E-002",
+      "acceptance_ids": [
+        "AC-002"
+      ],
+      "system_ids": [
+        "SR-002"
+      ],
+      "kind": "api-e2e",
+      "priority": "must",
+      "required": true,
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ],
+      "data_setup": "Независимая временная файловая SQLite с legacy таблицей и двумя владельцами; отдельный server child process",
+      "steps": [
+        "priority собственной заявки успешно изменён",
+        "сервис перезапускается на той же БД"
+      ],
+      "oracle": "GET возвращает сохранённые priority и version",
+      "cleanup": "SIGTERM server; дождаться завершения; удалить только свою mkdtemp fixture",
+      "test_file": "tests/e2e/ticket-priority.e2e.mjs"
+    },
+    {
+      "id": "E2E-003",
+      "acceptance_ids": [
+        "AC-003"
+      ],
+      "system_ids": [
+        "SR-003"
+      ],
+      "kind": "api-e2e",
+      "priority": "must",
+      "required": true,
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ],
+      "data_setup": "Независимая временная файловая SQLite с legacy таблицей и двумя владельцами; отдельный server child process",
+      "steps": [
+        "Заявка принадлежит другому пользователю",
+        "bob выполняет GET/PATCH t-alice"
+      ],
+      "oracle": "404/not_found, тело заявки не раскрыто, данные не изменены",
+      "cleanup": "SIGTERM server; дождаться завершения; удалить только свою mkdtemp fixture",
+      "test_file": "tests/e2e/ticket-priority.e2e.mjs"
+    },
+    {
+      "id": "E2E-004",
+      "acceptance_ids": [
+        "AC-004"
+      ],
+      "system_ids": [
+        "SR-004"
+      ],
+      "kind": "api-e2e",
+      "priority": "must",
+      "required": true,
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ],
+      "data_setup": "Независимая временная файловая SQLite с legacy таблицей и двумя владельцами; отдельный server child process",
+      "steps": [
+        "Нет действительного token",
+        "клиент выполняет PATCH"
+      ],
+      "oracle": "401/unauthorized и отсутствие изменения данных",
+      "cleanup": "SIGTERM server; дождаться завершения; удалить только свою mkdtemp fixture",
+      "test_file": "tests/e2e/ticket-priority.e2e.mjs"
+    },
+    {
+      "id": "E2E-005",
+      "acceptance_ids": [
+        "AC-005"
+      ],
+      "system_ids": [
+        "SR-005"
+      ],
+      "kind": "api-e2e",
+      "priority": "must",
+      "required": true,
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ],
+      "data_setup": "Независимая временная файловая SQLite с legacy таблицей и двумя владельцами; отдельный server child process",
+      "steps": [
+        "Валидный владелец и версия",
+        "PATCH с priority=urgent"
+      ],
+      "oracle": "400/invalid_priority, прежние priority/version сохранены",
+      "cleanup": "SIGTERM server; дождаться завершения; удалить только свою mkdtemp fixture",
+      "test_file": "tests/e2e/ticket-priority.e2e.mjs"
+    },
+    {
+      "id": "E2E-006",
+      "acceptance_ids": [
+        "AC-006"
+      ],
+      "system_ids": [
+        "SR-006"
+      ],
+      "kind": "api-e2e",
+      "priority": "must",
+      "required": true,
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ],
+      "data_setup": "Независимая временная файловая SQLite с legacy таблицей и двумя владельцами; отдельный server child process",
+      "steps": [
+        "Валидный владелец",
+        "PATCH с broken JSON, missing/noninteger version либо неизвестным полем"
+      ],
+      "oracle": "400 с error для структуры/JSON, 415 для не-JSON content-type, 413 для тела >8192 bytes; состояние заявки не меняется",
+      "cleanup": "SIGTERM server; дождаться завершения; удалить только свою mkdtemp fixture",
+      "test_file": "tests/e2e/ticket-priority.e2e.mjs"
+    },
+    {
+      "id": "E2E-007",
+      "acceptance_ids": [
+        "AC-007"
+      ],
+      "system_ids": [
+        "SR-007"
+      ],
+      "kind": "api-e2e",
+      "priority": "must",
+      "required": true,
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ],
+      "data_setup": "Независимая временная файловая SQLite с legacy таблицей и двумя владельцами; отдельный server child process",
+      "steps": [
+        "Два клиента прочитали version=1",
+        "одновременно отправляют разные приоритеты с expectedVersion=1"
+      ],
+      "oracle": "Ровно один 200 и один 409; версия становится 2, победившее значение не потеряно",
+      "cleanup": "SIGTERM server; дождаться завершения; удалить только свою mkdtemp fixture",
+      "test_file": "tests/e2e/ticket-priority.e2e.mjs"
+    },
+    {
+      "id": "E2E-008",
+      "acceptance_ids": [
+        "AC-008"
+      ],
+      "system_ids": [
+        "SR-008"
+      ],
+      "kind": "api-e2e",
+      "priority": "must",
+      "required": true,
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ],
+      "data_setup": "Независимая временная файловая SQLite с legacy таблицей и двумя владельцами; отдельный server child process",
+      "steps": [
+        "Существующая таблица без priority/version",
+        "запускается обновлённое приложение"
+      ],
+      "oracle": "id/title сохранены; GET содержит priority=normal, version=1",
+      "cleanup": "SIGTERM server; дождаться завершения; удалить только свою mkdtemp fixture",
+      "test_file": "tests/e2e/ticket-priority.e2e.mjs"
+    },
+    {
+      "id": "E2E-009",
+      "acceptance_ids": [
+        "AC-009"
+      ],
+      "system_ids": [
+        "SR-009"
+      ],
+      "kind": "api-e2e",
+      "priority": "must",
+      "required": true,
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ],
+      "data_setup": "Независимая временная файловая SQLite с legacy таблицей и двумя владельцами; отдельный server child process",
+      "steps": [
+        "Запрошен отсутствующий id",
+        "авторизованный пользователь меняет приоритет"
+      ],
+      "oracle": "404/not_found как для чужой заявки; существующие записи не изменены",
+      "cleanup": "SIGTERM server; дождаться завершения; удалить только свою mkdtemp fixture",
+      "test_file": "tests/e2e/ticket-priority.e2e.mjs"
+    }
+  ]
+}

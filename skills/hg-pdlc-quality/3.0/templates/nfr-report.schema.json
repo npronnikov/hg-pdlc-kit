@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "runner",
+    "started_at",
+    "finished_at",
+    "checks"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "runner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "started_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "finished_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "metric",
+          "observed",
+          "unit",
+          "conditions",
+          "verification",
+          "status"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^NFR-[A-Za-z0-9-]+$"
+          },
+          "metric": {
+            "type": "string",
+            "minLength": 1
+          },
+          "observed": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "conditions": {
+            "type": "string",
+            "minLength": 1
+          },
+          "verification": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "passed",
+              "failed",
+              "blocked"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

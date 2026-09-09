@@ -1,0 +1,21 @@
+entity_type: skill
+id: hg-pdlc-quality
+version: '3.0'
+canonical_name: hg-pdlc-quality@3.0
+display_name: Независимые ревью и машинные проверки
+description: Проверяет полноту контрактов, трассу и фактические E2E; содержит детерминированные валидаторы.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/hg-pdlc-quality/3.0
+checksum: 7131e06e622f1a68b899b924eaf8662beca4912948fa1ec0d59668281d30e36d
+skill_kind: review

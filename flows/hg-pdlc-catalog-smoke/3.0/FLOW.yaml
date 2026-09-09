@@ -1,0 +1,99 @@
+id: hg-pdlc-catalog-smoke
+version: '3.0'
+canonical_name: hg-pdlc-catalog-smoke@3.0
+title: 'Проверка каталога: resources, subagent, scope и human rework'
+description: 'Проверка на живом HG перед delivery: чтение вложенных ресурсов, native Qwen subagent, project/run, два
+  режима Rework.'
+coding_agent: qwen
+start_node_id: ai-smoke
+failure_node_id: terminal-failed
+fail_on_missing_declared_output: true
+fail_on_missing_expected_mutation: false
+rule_refs: []
+nodes:
+- id: ai-smoke
+  title: Проверить materialization resources и native subagent
+  type: ai
+  routing_type: dynamic
+  execution_context: []
+  instruction: |
+    <#assign feedback0 = step["human-smoke"]!{} />
+    <#if feedback0.rework_instruction?has_content>
+    Замечания из human-smoke (проверить актуальность finding_id и basis_hash):
+    <#if (feedback0.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback0.rework_instruction}
+    </#if>
+    Прочитай реальный templates/stage-index.md и templates/rework.ftl skill hg-pdlc-method.
+    Вызови связанный acceptance-auditor с задачей проверить разделение scope в этих ресурсах.
+    В project docs/hg-catalog-smoke.md запиши имена прочитанных resources, фактический ответ subagent и вывод;
+    в run smoke-notes.md — промежуточные наблюдения. Если вызов невозможен, НЕ подменять роль; шаг должен быть blocked/failed.
+    Это smoke каталога, не разработка приложения и не E2E продукта.
+    Запиши route: on_success только после реального чтения resources и ответа subagent; иначе on_blocked.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+  skill_refs:
+  - hg-pdlc-method@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-acceptance-auditor@3.0
+  produced_artifacts:
+  - scope: project
+    path: docs/hg-catalog-smoke.md
+    required: true
+    modifiable: false
+  - scope: run
+    path: smoke-notes.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: human-smoke
+  on_blocked:
+    transition: terminal-failed
+- id: human-smoke
+  title: Проверить native вызов и оба scope
+  type: human_approval
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-smoke
+    path: docs/hg-catalog-smoke.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-smoke
+    path: smoke-notes.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: Рассмотрите полезные project-документы по ссылкам и краткий индекс. Approve подтверждает именно показанную
+    ревизию; Rework — конкретные замечания. Выберите сохранение изменений либо откат в штатном HG SDLC интерфейсе.
+  allowed_roles:
+  - FLOW_CONFIGURATOR
+  produced_artifacts: []
+  expected_mutations: []
+  on_approve:
+    transition: terminal-done
+  on_rework:
+    transition: ai-smoke
+- id: terminal-done
+  title: Каталог smoke пройден
+  type: terminal
+  execution_context: []
+  produced_artifacts: []
+  expected_mutations: []
+- id: terminal-failed
+  title: Каталог smoke не пройден
+  type: terminal
+  execution_context: []
+  produced_artifacts: []
+  expected_mutations: []

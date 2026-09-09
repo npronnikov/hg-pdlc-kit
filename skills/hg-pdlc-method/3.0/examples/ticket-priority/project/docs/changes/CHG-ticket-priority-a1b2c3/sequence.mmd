@@ -1,0 +1,14 @@
+sequenceDiagram
+  actor Owner
+  participant API
+  participant DB as SQLite
+  Owner->>API: PATCH priority + expectedVersion
+  API->>API: Auth + ownership + validation
+  API->>DB: UPDATE WHERE owner AND version=expected
+  alt One row updated
+    DB-->>API: priority and incremented version
+    API-->>Owner: 200
+  else Stale version
+    DB-->>API: zero rows
+    API-->>Owner: 409, no lost update
+  end

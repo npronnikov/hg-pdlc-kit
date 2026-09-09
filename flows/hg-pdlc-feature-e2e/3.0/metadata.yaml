@@ -1,0 +1,23 @@
+entity_type: flow
+id: hg-pdlc-feature-e2e
+version: '3.0'
+canonical_name: hg-pdlc-feature-e2e@3.0
+display_name: 'Монорепа: фича → PRD → архитектура → SRS → код → E2E'
+description: Единый HG SDLC flow для brownfield/greenfield, с пакетным интервью, PRD approval, native Qwen subagents,
+  FreeMarker rework и разделением project/run.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: flows/hg-pdlc-feature-e2e/3.0
+checksum: afb00e69ced1e6f68024749fbc63f88f6d4c359de4f882de9d212c0ddccb82df
+flow_kind: delivery
+risk_level: medium

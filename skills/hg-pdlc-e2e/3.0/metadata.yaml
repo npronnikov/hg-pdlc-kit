@@ -1,0 +1,21 @@
+entity_type: skill
+id: hg-pdlc-e2e
+version: '3.0'
+canonical_name: hg-pdlc-e2e@3.0
+display_name: Автоматизация E2E после кода
+description: Пишет исполняемые E2E и reporter, сохраняя ранее согласованные ожидания.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/hg-pdlc-e2e/3.0
+checksum: 16ff5d3c61feb4f65c0b84f12e44d74433df62fbc9569782c24dd1f9085eb955
+skill_kind: analysis

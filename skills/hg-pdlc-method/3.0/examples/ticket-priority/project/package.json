@@ -1,0 +1,14 @@
+{
+  "name": "ticket-priority-monorepo-example",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.16.0"
+  },
+  "scripts": {
+    "start": "node apps/api/server.mjs",
+    "test": "node --test tests/unit/*.test.mjs",
+    "test:e2e": "node tests/e2e/ticket-priority.e2e.mjs"
+  }
+}

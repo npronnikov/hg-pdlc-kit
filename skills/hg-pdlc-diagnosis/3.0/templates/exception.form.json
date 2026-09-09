@@ -1,0 +1,14 @@
+{
+  "kind": "human-form",
+  "version": "1",
+  "title": "Решение по блокеру",
+  "fields": [
+    {
+      "id": "resolution",
+      "type": "textarea",
+      "label": "Укажите решение/разрешённую среду. Не вводите секреты.",
+      "required": true,
+      "value": null
+    }
+  ]
+}

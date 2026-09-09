@@ -1,0 +1,12 @@
+{
+  "step_id": "ai-example-review",
+  "attempt": 1,
+  "status": "done",
+  "route": "on_rework",
+  "actions": [
+    "Inspected actual input artifacts"
+  ],
+  "feedback_id": "review-attempt-1-finding-001",
+  "basis_hash": "REPLACE_WITH_SHA256",
+  "rework_instruction": "F-001 | project/path.md:section | linked SR-001 | причина | исправление | перепроверка"
+}

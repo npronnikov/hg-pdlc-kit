@@ -1,0 +1,13 @@
+{
+  "status": "observed",
+  "components": [
+    {
+      "id": "CMP-api",
+      "path": "apps/api/server.mjs"
+    },
+    {
+      "id": "CMP-store",
+      "path": "SQLite file (runtime fixture)"
+    }
+  ]
+}

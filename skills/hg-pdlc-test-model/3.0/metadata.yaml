@@ -1,0 +1,21 @@
+entity_type: skill
+id: hg-pdlc-test-model
+version: '3.0'
+canonical_name: hg-pdlc-test-model@3.0
+display_name: Модель E2E до реализации
+description: Создаёт независимый oracle, сценарии Gherkin и трассировку до написания кода.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/hg-pdlc-test-model/3.0
+checksum: 40d1ea9bbb4658e0527e508e5c771cff5cadf22cd17e6732baeb2328f117c718
+skill_kind: analysis

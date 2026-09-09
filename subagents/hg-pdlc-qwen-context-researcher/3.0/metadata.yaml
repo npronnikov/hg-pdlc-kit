@@ -1,0 +1,22 @@
+entity_type: subagent
+id: hg-pdlc-qwen-context-researcher
+version: '3.0'
+canonical_name: hg-pdlc-qwen-context-researcher@3.0
+display_name: Исследователь монорепы
+description: Найди подтверждаемые источники в docs/code/test и отдели observed/inferred; найди конфликт baseline.
+  Не писать код.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/hg-pdlc-qwen-context-researcher/3.0
+checksum: 2e73ad5c0eb98e03f4d1272aeed0e9a2891fc622471fd4ad7b2182bd8e8dc2ab
+definition_file: hg-pdlc-qwen-context-researcher.md

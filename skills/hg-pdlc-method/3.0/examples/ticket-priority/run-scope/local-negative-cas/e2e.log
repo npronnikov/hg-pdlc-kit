@@ -1,0 +1,25 @@
+E2E-001 passed
+E2E-002 passed
+E2E-003 passed
+E2E-004 passed
+E2E-005 passed
+E2E-006 passed
+E2E-008 passed
+E2E-009 passed
+
+(node:1659) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+E2E-007 failed: AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
+  [
+    200,
++   200
+-   409
+  ]
+
+    at file:///mnt/data/hgsdlc-monorepo-catalog-3.0/aidlc/skills/hg-pdlc-method/3.0/examples/ticket-priority/project/tests/e2e/ticket-priority.e2e.mjs:79:10
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async fixture (file:///mnt/data/hgsdlc-monorepo-catalog-3.0/aidlc/skills/hg-pdlc-method/3.0/examples/ticket-priority/project/tests/e2e/ticket-priority.e2e.mjs:35:30)
+    at async run (file:///mnt/data/hgsdlc-monorepo-catalog-3.0/aidlc/skills/hg-pdlc-method/3.0/examples/ticket-priority/project/tests/e2e/ticket-priority.e2e.mjs:45:6)
+    at async file:///mnt/data/hgsdlc-monorepo-catalog-3.0/aidlc/skills/hg-pdlc-method/3.0/examples/ticket-priority/project/tests/e2e/ticket-priority.e2e.mjs:77:2

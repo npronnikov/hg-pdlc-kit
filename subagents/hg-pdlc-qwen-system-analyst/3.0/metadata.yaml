@@ -1,0 +1,21 @@
+entity_type: subagent
+id: hg-pdlc-qwen-system-analyst
+version: '3.0'
+canonical_name: hg-pdlc-qwen-system-analyst@3.0
+display_name: Системный аналитик
+description: Проверь атомарность/верифицируемость SR, контракты, auth/data/errors/concurrency и трассу к BR/AC/CMP.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/hg-pdlc-qwen-system-analyst/3.0
+checksum: 4781709739e7feafced201c93a5c623277780f03663cc82f2da253f05c12fdb5
+definition_file: hg-pdlc-qwen-system-analyst.md

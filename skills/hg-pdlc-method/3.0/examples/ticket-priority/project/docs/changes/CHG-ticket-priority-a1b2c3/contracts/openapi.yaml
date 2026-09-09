@@ -1,0 +1,141 @@
+openapi: 3.1.0
+info:
+  title: Ticket priority API (educational)
+  version: 0.1.0
+security:
+- bearerAuth: []
+paths:
+  /api/tickets/{id}:
+    parameters:
+    - &id001
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[a-zA-Z0-9-]+$
+    get:
+      operationId: readOwnedTicket
+      responses:
+        '200': &id002
+          description: Current or updated ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '401': &id003
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404': &id004
+          description: Not found or inaccessible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500': &id005
+          description: Internal error without details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/tickets/{id}/priority:
+    parameters:
+    - *id001
+    patch:
+      operationId: changeOwnedPriority
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriorityChange'
+      responses:
+        '200': *id002
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401': *id003
+        '404': *id004
+        '409':
+          description: Version conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: Request exceeds 8192 bytes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: JSON content type required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '405':
+          description: Unsupported method
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500': *id005
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    Ticket:
+      type: object
+      required:
+      - id
+      - title
+      - priority
+      - version
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        priority:
+          type: string
+          enum:
+          - low
+          - normal
+          - high
+        version:
+          type: integer
+          minimum: 1
+    PriorityChange:
+      type: object
+      required:
+      - priority
+      - expectedVersion
+      additionalProperties: false
+      properties:
+        priority:
+          type: string
+          enum:
+          - low
+          - normal
+          - high
+        expectedVersion:
+          type: integer
+          minimum: 1
+          maximum: 9007199254740991
+    Error:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string

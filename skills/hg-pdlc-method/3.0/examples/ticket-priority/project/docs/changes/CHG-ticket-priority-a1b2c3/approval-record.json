@@ -1,0 +1,8 @@
+{
+  "gate": "human-prd",
+  "decision": "approved",
+  "origin": "DEMO_FIXTURE_NOT_LIVE_HG_EVENT",
+  "actor": "illustrative_product_owner",
+  "prd_sha256": "9e37474ffe2ed1cbefcc00b50cd2aecc745f79f4c02d3bad3084e4dbaa3b4181",
+  "business_sha256": "6ca6d6232e5f2aa6a5608d20f4c742d63768a1926bc2cbe5ba6e1e31d5397940"
+}

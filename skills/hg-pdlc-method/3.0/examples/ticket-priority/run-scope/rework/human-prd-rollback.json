@@ -1,0 +1,10 @@
+{
+  "step_id": "human-prd",
+  "attempt": 1,
+  "status": "done",
+  "route": "on_rework",
+  "keep_changes": false,
+  "feedback_id": "DEMO-F-PRD-001",
+  "rework_instruction": "F-PRD-001: в prd.md явно исключить изменение чужой заявки и зафиксировать 404 без раскрытия. Обновить BR-002/AC-003 и повторить PRD review.",
+  "origin": "illustrative fixture"
+}

@@ -1,0 +1,21 @@
+entity_type: skill
+id: hg-pdlc-baseline
+version: '3.0'
+canonical_name: hg-pdlc-baseline@3.0
+display_name: Исходная документация продукта
+description: Восстанавливает AS-IS brownfield или создаёт явно proposed foundation greenfield в project scope.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/hg-pdlc-baseline/3.0
+checksum: 77fd1b381c09bf5de4bbce6acbc8be490e14be4803a10f7530f4a25991cd0677
+skill_kind: analysis

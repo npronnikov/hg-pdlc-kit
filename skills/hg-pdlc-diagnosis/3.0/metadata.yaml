@@ -1,0 +1,21 @@
+entity_type: skill
+id: hg-pdlc-diagnosis
+version: '3.0'
+canonical_name: hg-pdlc-diagnosis@3.0
+display_name: Диагностика и ограниченный ремонт среды
+description: Возвращает дефект к источнику и исправляет только тестовую среду без ослабления требований.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/hg-pdlc-diagnosis/3.0
+checksum: f9770c2e36e7e3e9b6630f8bfa574a2ba48c6a876b4f509210002a367cb5ddb9
+skill_kind: analysis

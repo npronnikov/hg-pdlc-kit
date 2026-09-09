@@ -1,0 +1,13 @@
+sequenceDiagram
+  actor User
+  participant API
+  participant DB
+  User->>API: Запрос
+  API->>API: Валидация и авторизация
+  alt Разрешённый запрос
+    API->>DB: Транзакционное изменение
+    DB-->>API: Результат
+    API-->>User: Наблюдаемый успех
+  else Нарушено условие
+    API-->>User: Договорённая ошибка без изменения данных
+  end

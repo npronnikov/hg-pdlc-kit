@@ -1,0 +1,21 @@
+entity_type: skill
+id: hg-pdlc-consolidation
+version: '3.0'
+canonical_name: hg-pdlc-consolidation@3.0
+display_name: Актуализация продукта и доказательства
+description: Сохраняет подтверждённый change-set и актуальные продуктовые ссылки после реальных E2E.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/hg-pdlc-consolidation/3.0
+checksum: 7bf0c8f675b0d81db518d5359f0b603e1cb64ef0e71a05c7189c84ef98bca9a8
+skill_kind: analysis

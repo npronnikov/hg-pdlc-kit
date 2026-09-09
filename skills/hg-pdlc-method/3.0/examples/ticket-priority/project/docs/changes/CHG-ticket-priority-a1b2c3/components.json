@@ -1,0 +1,32 @@
+{
+  "change_id": "CHG-ticket-priority-a1b2c3",
+  "components": [
+    {
+      "id": "CMP-api",
+      "type": "container",
+      "responsibility": "HTTP/auth/validation/priority use case",
+      "repo_paths": [
+        "apps/api/"
+      ],
+      "dependencies": [
+        "CMP-store"
+      ],
+      "interfaces": [
+        "GET /api/tickets/{id}",
+        "PATCH /api/tickets/{id}/priority"
+      ]
+    },
+    {
+      "id": "CMP-store",
+      "type": "container",
+      "responsibility": "Долговременные заявки и атомарная проверка версии",
+      "repo_paths": [
+        "apps/api/server.mjs"
+      ],
+      "dependencies": [],
+      "interfaces": [
+        "SQLite prepared statements; additive migration"
+      ]
+    }
+  ]
+}

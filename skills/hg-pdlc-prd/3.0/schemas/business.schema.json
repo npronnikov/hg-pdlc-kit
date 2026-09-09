@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "business",
+  "type": "object",
+  "properties": {
+    "change_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "business_requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9-]*$"
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          },
+          "priority": {
+            "enum": [
+              "must",
+              "should",
+              "could"
+            ]
+          },
+          "source_refs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "repository",
+                    "product-spec",
+                    "human-gate",
+                    "derived"
+                  ]
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "revision": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "locator": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "confidence": {
+                  "enum": [
+                    "observed",
+                    "inferred",
+                    "proposed",
+                    "confirmed"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "path",
+                "revision",
+                "locator",
+                "confidence"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1
+          },
+          "acceptance_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Za-z0-9-]*$"
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "id",
+          "statement",
+          "rationale",
+          "priority",
+          "source_refs",
+          "acceptance_ids"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9-]*$"
+          },
+          "business_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Za-z0-9-]*$"
+            },
+            "minItems": 1
+          },
+          "given": {
+            "type": "string",
+            "minLength": 1
+          },
+          "when": {
+            "type": "string",
+            "minLength": 1
+          },
+          "then": {
+            "type": "string",
+            "minLength": 1
+          },
+          "negative_or_boundary": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "business_ids",
+          "given",
+          "when",
+          "then",
+          "negative_or_boundary"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "change_id",
+    "business_requirements",
+    "acceptance_criteria"
+  ],
+  "additionalProperties": false
+}

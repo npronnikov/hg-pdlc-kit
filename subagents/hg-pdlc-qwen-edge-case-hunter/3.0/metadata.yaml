@@ -1,0 +1,22 @@
+entity_type: subagent
+id: hg-pdlc-qwen-edge-case-hunter
+version: '3.0'
+canonical_name: hg-pdlc-qwen-edge-case-hunter@3.0
+display_name: Ревьюер пограничных случаев
+description: 'Изучи diff и ближайший код: lifecycle, concurrency, failures, schema/API, недостающие проверки; не стиль
+  ради стиля.'
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/hg-pdlc-qwen-edge-case-hunter/3.0
+checksum: 66b33b21fefc5fea269973afbc6db81b63b9e2dda56c7ac1f9ed6db14643999b
+definition_file: hg-pdlc-qwen-edge-case-hunter.md

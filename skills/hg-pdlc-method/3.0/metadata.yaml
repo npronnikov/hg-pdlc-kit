@@ -1,0 +1,21 @@
+entity_type: skill
+id: hg-pdlc-method
+version: '3.0'
+canonical_name: hg-pdlc-method@3.0
+display_name: Метод сквозной разработки в HG SDLC
+description: Контракты этапов, scope, идентификаторы, безопасность и FreeMarker-реворки; не отдельный runtime.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/hg-pdlc-method/3.0
+checksum: d9366084a1ae52d502e76c8911496fed0aedb2a146b1b86dc0afb32ee84e093d
+skill_kind: analysis

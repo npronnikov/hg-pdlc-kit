@@ -1,0 +1,8 @@
+flowchart LR
+  client["External HTTP client"]
+  subgraph product["Ticket product boundary"]
+    api["CMP-api: Node HTTP API"]
+    db[("CMP-store: SQLite file")]
+    api -->|"prepared SQL + version condition"| db
+  end
+  client -->|"GET / PATCH"| api

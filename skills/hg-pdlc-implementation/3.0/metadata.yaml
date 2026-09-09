@@ -1,0 +1,21 @@
+entity_type: skill
+id: hg-pdlc-implementation
+version: '3.0'
+canonical_name: hg-pdlc-implementation@3.0
+display_name: Реализация по согласованному контракту
+description: Изменяет код и необходимые unit/integration тесты, не подменяя последующие E2E.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/hg-pdlc-implementation/3.0
+checksum: 5e455e749be34594b1e71547d0f49b4b5d21438c5342f2a432da8e0a29c6960e
+skill_kind: analysis

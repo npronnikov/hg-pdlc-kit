@@ -1,0 +1,6 @@
+openapi: 3.1.0
+info:
+  title: Replace with product API
+  version: 0.1.0
+paths: {}
+# Author must replace empty paths; N/A only through contracts-index.md with rationale.

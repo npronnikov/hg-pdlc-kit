@@ -1,0 +1,22 @@
+entity_type: subagent
+id: hg-pdlc-qwen-security-reviewer
+version: '3.0'
+canonical_name: hg-pdlc-qwen-security-reviewer@3.0
+display_name: Ревьюер безопасности
+description: Проверь права/tenant isolation, input validation, secrets, PII, trust boundaries и безопасную тестовую
+  среду.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/hg-pdlc-qwen-security-reviewer/3.0
+checksum: 9e3bfea5f74a09853d94df0493ce3da4d8770f8788a93fba13f39e201425a053
+definition_file: hg-pdlc-qwen-security-reviewer.md

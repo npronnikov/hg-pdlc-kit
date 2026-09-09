@@ -1,0 +1,68 @@
+{
+  "basis": "User attached aidlc(1).zip; not current GitHub HEAD",
+  "archive_sha256": "2afdbf7e4ed5df65546bc140001f426a6ec9a78cd7b2268c6a28fa3539e2a9de",
+  "inspected_reference_files": [
+    {
+      "path": "aidlc/flows/qwen-subagent-smoke-flow/1.0/FLOW.yaml",
+      "sha256": "f2b1a0016edc50e903b43f80ffb5da1f868e17de0b12c15217c30e5aedf3edce"
+    },
+    {
+      "path": "aidlc/subagents/aidlc-qwen-review-acceptance-auditor/1.0/metadata.yaml",
+      "sha256": "6889f73e078c9fd5721ac2be5818d68e8e7a77e1c4dac9122e03c24940a0d9e1"
+    },
+    {
+      "path": "aidlc/subagents/aidlc-qwen-review-acceptance-auditor/1.0/aidlc-qwen-review-acceptance-auditor.md",
+      "sha256": "f2bb3e23803fd6df96b44b33201f803b5f06301b1a933e81ab50f2b68c1f99dd"
+    },
+    {
+      "path": "aidlc/flows/hgdlc-light-development-flow/1.0/FLOW.yaml",
+      "sha256": "124a2e6eb6932ec548fd6c390641b9d2fe2e7666eb3fa6dd333119720ca83320"
+    },
+    {
+      "path": "aidlc/flows/questions-form-flow/1.1/FLOW.yaml",
+      "sha256": "76bdff91f662b92ca616c12c266ffcb363d13a5c297f6e5cc3afa8caf6652494"
+    },
+    {
+      "path": "aidlc/skills/generate-form-questions/1.0/SKILL.md",
+      "sha256": "114e9e54eb191ad643af40923d3f43dc47575e162f803b7b684dfc4b6a0ba6ac"
+    },
+    {
+      "path": "aidlc/flows/qwen-command-node-template-demo/1.0/FLOW.yaml",
+      "sha256": "b0bdd5a3dba9b54ebbaba805289cad97f07f55375e37b5583e33220104c8ca32"
+    },
+    {
+      "path": "aidlc/flows/openspec-full-cycle/1.0/FLOW.yaml",
+      "sha256": "eadee23b122cd4b5835ceb41f7ca0f844285749fe519f92e2b08f1c217e8312d"
+    },
+    {
+      "path": "aidlc/skills/openspec-propose/1.0/SKILL.md",
+      "sha256": "660828b8ce823e2da0305c57177d52c78a065b4bfe8ebf065df853adcbf6135d"
+    },
+    {
+      "path": "aidlc/flows/aidlc-full-process-flow/1.0/FLOW.yaml",
+      "sha256": "2cc547c55c8d3681e1675cd7bf0c715bad1d798a9b8952f59bdd31ffe5ad39dd"
+    },
+    {
+      "path": "aidlc/skills/aidlc-requirements-document/1.0/SKILL.md",
+      "sha256": "56745118363bd0e2ea05a671780d5740223d05517d95c65250b94d207463678e"
+    },
+    {
+      "path": "aidlc/flows/aidlc-reverse-engineering-flow/1.0/FLOW.yaml",
+      "sha256": "5c3d9d3ea34ffe5c35d2851a142e051985fbafc030e2a9b69407a4014c67a219"
+    },
+    {
+      "path": "aidlc/flows/glob-test/1.0/FLOW.yaml",
+      "sha256": "02a507e0ae2db6adc77bcf1140a66914c71893e8e70dcd02a728cbf66b632a98"
+    },
+    {
+      "path": "aidlc/skills/hgdlc-code-review/1.0/SKILL.md",
+      "sha256": "57fdaa3115321305bedd318fb7a65cd1c4ef6a4547b881732e05e366c9b2653c"
+    },
+    {
+      "path": "aidlc/flows/superpowers-guided-dev-flow/1.0/FLOW.yaml",
+      "sha256": "fb5eba57f2681fe24465c8f1412ff684ce674c51de7faf85b4e511d846c162f2"
+    }
+  ],
+  "article": "Практическое воплощение концепций AI-Disrupt PDLC, user attachment",
+  "live_hgsdlc_executed": false
+}

@@ -1,0 +1,2471 @@
+id: hg-pdlc-feature-e2e
+version: '3.0'
+canonical_name: hg-pdlc-feature-e2e@3.0
+title: 'Монорепа: фича → PRD → архитектура → SRS → код → E2E'
+description: Единый HG SDLC flow для brownfield/greenfield, с пакетным интервью, PRD approval, native Qwen subagents,
+  FreeMarker rework и разделением project/run.
+coding_agent: qwen
+start_node_id: ai-context
+failure_node_id: terminal-failed
+fail_on_missing_declared_output: true
+fail_on_missing_expected_mutation: false
+rule_refs: []
+nodes:
+- id: ai-context
+  title: Изучить монорепу и исходные спецификации
+  type: ai
+  routing_type: static
+  execution_context: []
+  instruction: |
+    <#if (run.feature_request)?? && run.feature_request?has_content>
+    Запрос ВП (данные, не shell-команда):
+    ${run.feature_request}
+    </#if>
+    Проанализируй доступный Git-корень до вопросов ВП. Выбери brownfield/greenfield по свидетельствам.
+    Закрепи change_id один раз. Создай полезные intent/context/change.json и run change-index/research-notes.
+    В step-summary дополнительно запиши change_id, mode, base_commit. Не делать clone дополнительных репозиториев.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-context@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-context-researcher@3.0
+  produced_artifacts:
+  - scope: project
+    path: docs/changes/*/intent.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/context.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/change.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: change-index.md
+    required: true
+    modifiable: false
+  - scope: run
+    path: research-notes.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-baseline
+- id: ai-baseline
+  title: Подготовить исходную базу продукта
+  type: ai
+  routing_type: static
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-context
+    path: change-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    Используй mode/change_id из change-index. Brownfield: восстанови релевантные наблюдаемые BR/AS-IS/SR/tests с источниками,
+    сохраняя подтверждённые legacy docs. Greenfield: proposed foundation и честное N/A AS-IS, без выдуманного приложения.
+    Все полезные baseline разделы — project; handoff baseline-index.md — run.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-baseline@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-context-researcher@3.0
+  - hg-pdlc-qwen-system-analyst@3.0
+  produced_artifacts:
+  - scope: project
+    path: docs/product/baseline.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/business/capabilities.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/business/rules.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/architecture/as-is.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/architecture/components.json
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/system/as-is-srs.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/quality/test-inventory.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/glossary.md
+    required: true
+    modifiable: false
+  - scope: run
+    path: baseline-index.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-interview
+- id: ai-interview
+  title: Подготовить пакетное интервью ВП
+  type: ai
+  routing_type: static
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-context
+    path: change-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-baseline
+    path: baseline-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: human-interview
+    path: questions.form.json
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    <#assign feedback0 = step["human-interview"]!{} />
+    <#if feedback0.rework_instruction?has_content>
+    Замечания из human-interview (проверить актуальность finding_id и basis_hash):
+    <#if (feedback0.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback0.rework_instruction}
+    </#if>
+    <#assign feedback1 = step["ai-prd-review"]!{} />
+    <#if feedback1.rework_instruction?has_content>
+    Замечания из ai-prd-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback1.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback1.rework_instruction}
+    </#if>
+    <#assign feedback2 = step["ai-diagnose"]!{} />
+    <#if feedback2.rework_instruction?has_content>
+    Замечания из ai-diagnose (проверить актуальность finding_id и basis_hash):
+    <#if (feedback2.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback2.rework_instruction}
+    </#if>
+    Изучи context и baseline. Спроси только недостающие бизнес-решения; при повторе сохрани валидные прежние ответы.
+    Создай questions.form.json точно в human-form формате ресурса и краткий interview-brief.md.
+    Вопросы и сырой ответ — run, не project. Не выбирай ответ за ВП.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-interview@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-business-analyst@3.0
+  produced_artifacts:
+  - scope: run
+    path: questions.form.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: interview-brief.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: human-interview
+- id: human-interview
+  title: 'ВП: ответить на нерешённые вопросы'
+  type: human_input
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-interview
+    path: questions.form.json
+    scope: run
+    required: true
+    modifiable: true
+    transfer_mode: by_ref
+  instruction: Заполните обязательные поля. Пустое поле не означает согласие с рекомендацией. Не вводите секреты.
+    Нажмите Submit.
+  allowed_roles:
+  - PRODUCT_OWNER
+  produced_artifacts:
+  - scope: run
+    path: questions.form.json
+    required: true
+    modifiable: true
+  expected_mutations: []
+  on_submit:
+    transition: ai-prd
+  on_rework:
+    transition: ai-interview
+- id: ai-prd
+  title: Сформировать исчерпывающий PRD и BR/AC
+  type: ai
+  routing_type: static
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-context
+    path: change-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-baseline
+    path: baseline-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: human-interview
+    path: questions.form.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_value
+  instruction: |
+    <#assign feedback0 = step["ai-prd-review"]!{} />
+    <#if feedback0.rework_instruction?has_content>
+    Замечания из ai-prd-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback0.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback0.rework_instruction}
+    </#if>
+    <#assign feedback1 = step["human-prd"]!{} />
+    <#if feedback1.rework_instruction?has_content>
+    Замечания из human-prd (проверить актуальность finding_id и basis_hash):
+    <#if (feedback1.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback1.rework_instruction}
+    </#if>
+    <#assign feedback2 = step["ai-architecture-review"]!{} />
+    <#if feedback2.rework_instruction?has_content>
+    Замечания из ai-architecture-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback2.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback2.rework_instruction}
+    </#if>
+    <#assign feedback3 = step["ai-srs-review"]!{} />
+    <#if feedback3.rework_instruction?has_content>
+    Замечания из ai-srs-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback3.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback3.rework_instruction}
+    </#if>
+    <#assign feedback4 = step["ai-contract-review"]!{} />
+    <#if feedback4.rework_instruction?has_content>
+    Замечания из ai-contract-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback4.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback4.rework_instruction}
+    </#if>
+    <#assign feedback5 = step["ai-code-review"]!{} />
+    <#if feedback5.rework_instruction?has_content>
+    Замечания из ai-code-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback5.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback5.rework_instruction}
+    </#if>
+    <#assign feedback6 = step["ai-diagnose"]!{} />
+    <#if feedback6.rework_instruction?has_content>
+    Замечания из ai-diagnose (проверить актуальность finding_id и basis_hash):
+    <#if (feedback6.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback6.rework_instruction}
+    </#if>
+    Прочитай заполненную форму by_value, baseline и intent. Создай prd.md/business.json/decisions.md в текущем CHG.
+    Не проставляй approved до gate. Сохрани run prd-index.md с точными ссылками и резюме решения для ВП.
+    Вычисли SHA256 business.json и prd.md в index; следующий human-prd должен видеть именно эту ревизию.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-prd@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-business-analyst@3.0
+  produced_artifacts:
+  - scope: project
+    path: docs/changes/*/prd.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/business.json
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/decisions.md
+    required: true
+    modifiable: false
+  - scope: run
+    path: prd-index.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-prd-review
+- id: ai-prd-review
+  title: Проверить бизнес-полноту и готовность к approval
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-prd
+    path: prd-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: human-interview
+    path: questions.form.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_value
+  instruction: |
+    Вызови business-analyst и acceptance-auditor. Проверь все секции PRD, полноту бизнес-сценариев и BR/AC, источники и unknown.
+    on_success: готово для ВП; on_rework: исправимая документальная ошибка; on_clarify: отсутствует бизнес-решение.
+    Сохрани prd-review.md с finding IDs. Не подменяй решение ВП голосованием агентов.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+
+    Запиши route строго из объявленных handlers: on_success, on_rework, on_clarify. При возврате обязательна конкретная rework_instruction.
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-quality@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-business-analyst@3.0
+  - hg-pdlc-qwen-acceptance-auditor@3.0
+  produced_artifacts:
+  - scope: run
+    path: prd-review.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: human-prd
+  on_rework:
+    transition: ai-prd
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: resume_previous_session
+  on_clarify:
+    transition: ai-interview
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+- id: human-prd
+  title: 'ВП: утвердить бизнес-контракт'
+  type: human_approval
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-prd
+    path: docs/changes/*/prd.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: docs/changes/*/business.json
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: prd-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: Рассмотрите полезные project-документы по ссылкам и краткий индекс. Approve подтверждает именно показанную
+    ревизию; Rework — конкретные замечания. Выберите сохранение изменений либо откат в штатном HG SDLC интерфейсе.
+  allowed_roles:
+  - PRODUCT_OWNER
+  produced_artifacts: []
+  expected_mutations: []
+  on_approve:
+    transition: ai-architecture
+  on_rework:
+    transition: ai-prd
+- id: ai-architecture
+  title: Спроектировать архитектурный delta
+  type: ai
+  routing_type: static
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-prd
+    path: prd-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-baseline
+    path: baseline-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-context
+    path: change-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    <#assign feedback0 = step["ai-architecture-review"]!{} />
+    <#if feedback0.rework_instruction?has_content>
+    Замечания из ai-architecture-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback0.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback0.rework_instruction}
+    </#if>
+    <#assign feedback1 = step["human-architecture"]!{} />
+    <#if feedback1.rework_instruction?has_content>
+    Замечания из human-architecture (проверить актуальность finding_id и basis_hash):
+    <#if (feedback1.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback1.rework_instruction}
+    </#if>
+    <#assign feedback2 = step["ai-srs-review"]!{} />
+    <#if feedback2.rework_instruction?has_content>
+    Замечания из ai-srs-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback2.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback2.rework_instruction}
+    </#if>
+    <#assign feedback3 = step["ai-code-review"]!{} />
+    <#if feedback3.rework_instruction?has_content>
+    Замечания из ai-code-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback3.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback3.rework_instruction}
+    </#if>
+    <#assign feedback4 = step["ai-diagnose"]!{} />
+    <#if feedback4.rework_instruction?has_content>
+    Замечания из ai-diagnose (проверить актуальность finding_id и basis_hash):
+    <#if (feedback4.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback4.rework_instruction}
+    </#if>
+    <#assign approvedPrd = step["human-prd"]!{} />
+    Runtime human-prd status: ${(approvedPrd.status)!"unavailable"}; route: ${(approvedPrd.route)!"unavailable"}.
+    Зафиксируй реальный факт human-prd по runtime gate/step context в approval-record.json (gate/node, revision/hash, available actor/time).
+    Если runtime не раскрывает actor/time, укажи unavailable; не выдумывай подписанта. Отметь статус approved без изменения принятого текста PRD.
+    Создай architecture.md (arc42-lite), C4 Context/Containers, sequence и реальные ADR, components.json.
+    Сохрани architecture-index.md как scalar handoff. Подготовь risk findings для технического gate.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-architecture@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-architect@3.0
+  produced_artifacts:
+  - scope: project
+    path: docs/changes/*/architecture.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/context.mmd
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/containers.mmd
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/sequence.mmd
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/components.json
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/approval-record.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: architecture-index.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-architecture-review
+- id: ai-architecture-review
+  title: Проверить архитектуру, инварианты и риск
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-architecture
+    path: architecture-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: prd-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    Проведи независимые architect/security проходы. Сверь BR/AC с C4/ADR и реалистичностью тестовой среды.
+    on_success: низкий/средний риск и нет blockers; on_risk: нужен содержательный technical approval (auth/PII/data-loss/breaking API);
+    on_rework: ошибки проектирования; on_requirements: требуемое поведение противоречит PRD или его надо изменить.
+    Архитектурный компромисс не является разрешением менять BR.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+
+    Запиши route строго из объявленных handlers: on_success, on_risk, on_rework, on_requirements. При возврате обязательна конкретная rework_instruction.
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-quality@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-architect@3.0
+  - hg-pdlc-qwen-security-reviewer@3.0
+  produced_artifacts:
+  - scope: run
+    path: architecture-review.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-srs
+  on_risk:
+    transition: human-architecture
+  on_rework:
+    transition: ai-architecture
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: resume_previous_session
+  on_requirements:
+    transition: ai-prd
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+- id: human-architecture
+  title: Техническое согласование архитектуры
+  type: human_approval
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-architecture
+    path: docs/changes/*/architecture.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-architecture
+    path: architecture-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-architecture-review
+    path: architecture-review.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: Рассмотрите полезные project-документы по ссылкам и краткий индекс. Approve подтверждает именно показанную
+    ревизию; Rework — конкретные замечания. Выберите сохранение изменений либо откат в штатном HG SDLC интерфейсе.
+  allowed_roles:
+  - FLOW_CONFIGURATOR
+  produced_artifacts: []
+  expected_mutations: []
+  on_approve:
+    transition: ai-srs
+  on_rework:
+    transition: ai-architecture
+- id: ai-srs
+  title: Сформировать системные требования и интерфейсы
+  type: ai
+  routing_type: static
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-prd
+    path: prd-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-architecture
+    path: architecture-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    <#assign feedback0 = step["ai-srs-review"]!{} />
+    <#if feedback0.rework_instruction?has_content>
+    Замечания из ai-srs-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback0.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback0.rework_instruction}
+    </#if>
+    <#assign feedback1 = step["ai-contract-review"]!{} />
+    <#if feedback1.rework_instruction?has_content>
+    Замечания из ai-contract-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback1.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback1.rework_instruction}
+    </#if>
+    <#assign feedback2 = step["ai-code-review"]!{} />
+    <#if feedback2.rework_instruction?has_content>
+    Замечания из ai-code-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback2.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback2.rework_instruction}
+    </#if>
+    <#assign feedback3 = step["ai-diagnose"]!{} />
+    <#if feedback3.rework_instruction?has_content>
+    Замечания из ai-diagnose (проверить актуальность finding_id и basis_hash):
+    <#if (feedback3.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback3.rework_instruction}
+    </#if>
+    <#assign architectureGate = step["human-architecture"]!{} />
+    <#assign architectureReview = step["ai-architecture-review"]!{} />
+    Runtime architecture review route: ${(architectureReview.route)!"unavailable"}.
+    Runtime technical gate status: ${(architectureGate.status)!"unavailable"}; route: ${(architectureGate.route)!"unavailable"}.
+    После архитектуры создай SRS/system.json и применимые контракты.
+    Зафиксируй architecture-approval.json: architecture_sha256, requires_human, decision=approved либо not_required,
+    mode=risk_adaptive, gate/evidence и unavailable поля вместо выдуманных actor/time. on_risk требует actual human-architecture;
+    историческое approval другой ревизии не переносить. В governed-profile technical approval требуется всегда. Все SR/NFR измеримы либо проверяемы с указанным методом.
+    contracts-index.md объясняет применимость HTTP/events/UI. Если HTTP есть, выпусти полноценный OpenAPI, не пустой template.
+    Передай srs-index.md с точными файлами, версиями, ссылками на BR/AC/CMP/ADR. Код пока не писать.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-srs@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-system-analyst@3.0
+  produced_artifacts:
+  - scope: project
+    path: docs/changes/*/srs.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/system.json
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/contracts-index.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/architecture-approval.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: srs-index.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-srs-review
+- id: ai-srs-review
+  title: Проверить системные контракты и трассировку
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-srs
+    path: srs-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-architecture
+    path: architecture-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: prd-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    Проверь атомарность SR, interface/data/auth/error/compatibility/NFR, отсутствие orphan требований и противоречий с архитектурой.
+    on_rework — SRS; on_architecture — архитектура; on_requirements — изменение бизнес-контракта; on_success — test-model.
+    Запиши srs-review.md и конкретный feedback для выбранной причины.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+
+    Запиши route строго из объявленных handlers: on_success, on_rework, on_architecture, on_requirements. При возврате обязательна конкретная rework_instruction.
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-quality@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-system-analyst@3.0
+  - hg-pdlc-qwen-test-designer@3.0
+  produced_artifacts:
+  - scope: run
+    path: srs-review.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-test-model
+  on_rework:
+    transition: ai-srs
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: resume_previous_session
+  on_architecture:
+    transition: ai-architecture
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+  on_requirements:
+    transition: ai-prd
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+- id: ai-test-model
+  title: Спроектировать независимую тестовую модель E2E
+  type: ai
+  routing_type: static
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-prd
+    path: prd-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-srs
+    path: srs-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-architecture
+    path: architecture-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    <#assign feedback0 = step["ai-contract-review"]!{} />
+    <#if feedback0.rework_instruction?has_content>
+    Замечания из ai-contract-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback0.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback0.rework_instruction}
+    </#if>
+    <#assign feedback1 = step["ai-diagnose"]!{} />
+    <#if feedback1.rework_instruction?has_content>
+    Замечания из ai-diagnose (проверить актуальность finding_id и basis_hash):
+    <#if (feedback1.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback1.rework_instruction}
+    </#if>
+    Создай test-model.md/json и scenarios.feature до application-кода. Покрой все AC реальными end-to-end сценариями,
+    негативные/граничные/регрессионные условия; NFR получат дополнительные подходящие проверки.
+    Для UI-фич browser E2E обязателен. Для API-only chain: external HTTP → app → real test DB.
+    Укажи oracle, fixtures, cleanup и stable E2E IDs; передай test-model-index.md.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-test-model@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-test-designer@3.0
+  produced_artifacts:
+  - scope: project
+    path: docs/changes/*/test-model.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/test-model.json
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/scenarios.feature
+    required: true
+    modifiable: false
+  - scope: run
+    path: test-model-index.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-plan
+- id: ai-plan
+  title: Построить план и обычные проверочные команды
+  type: ai
+  routing_type: static
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-prd
+    path: prd-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-architecture
+    path: architecture-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-srs
+    path: srs-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-test-model
+    path: test-model-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-contract-check
+    path: pdlc-run-contract-receipt.json
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    <#assign feedback0 = step["ai-contract-review"]!{} />
+    <#if feedback0.rework_instruction?has_content>
+    Замечания из ai-contract-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback0.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback0.rework_instruction}
+    </#if>
+    <#assign feedback1 = step["command-contract-check"]!{} />
+    <#if feedback1.rework_instruction?has_content>
+    Замечания из command-contract-check (проверить актуальность finding_id и basis_hash):
+    <#if (feedback1.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback1.rework_instruction}
+    </#if>
+    <#assign feedback2 = step["ai-diagnose"]!{} />
+    <#if feedback2.rework_instruction?has_content>
+    Замечания из ai-diagnose (проверить актуальность finding_id и basis_hash):
+    <#if (feedback2.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback2.rework_instruction}
+    </#if>
+    Создай implementation-plan.md/json с DAG и file-level задачами. Адаптируй templates build.sh/e2e.sh к монорепе.
+    Скопируй verify.mjs и JSON schemas из ресурсов подключённых skills в project tools/hg; проверь hash копий.
+    Создай tools/hg/schemas/index.json с полным перечнем schema-файлов и их SHA-256.
+    Это не установка runtime: scripts только проверяют артефакты/сборку/тесты, переходы оставлены в FLOW.
+    В .gitignore добавь только `pdlc-run-*` и служебные output patterns штатного runner, сохранив существующие правила.
+    Объявленные полезные outputs должны существовать и при rework; план и oracle не ослаблять ради failed test.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-plan@3.0
+  - hg-pdlc-quality@3.0
+  - hg-pdlc-prd@3.0
+  - hg-pdlc-architecture@3.0
+  - hg-pdlc-srs@3.0
+  - hg-pdlc-test-model@3.0
+  - hg-pdlc-e2e@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-system-analyst@3.0
+  - hg-pdlc-qwen-test-designer@3.0
+  produced_artifacts:
+  - scope: project
+    path: docs/changes/*/implementation-plan.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/implementation-plan.json
+    required: true
+    modifiable: false
+  - scope: project
+    path: tools/hg/build.sh
+    required: true
+    modifiable: false
+  - scope: project
+    path: tools/hg/e2e.sh
+    required: true
+    modifiable: false
+  - scope: project
+    path: tools/hg/verify.mjs
+    required: true
+    modifiable: false
+  - scope: project
+    path: tools/hg/schemas/index.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: plan-index.md
+    required: true
+    modifiable: false
+  expected_mutations:
+  - scope: project
+    path: .gitignore
+    required: false
+    modifiable: false
+  on_success:
+    transition: ai-contract-review
+- id: ai-contract-review
+  title: Проверить готовность сквозного контракта к коду
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-plan
+    path: plan-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-test-model
+    path: test-model-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-srs
+    path: srs-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: prd-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    Вызови acceptance-auditor/test-designer/security-reviewer. Проверь полный BR→AC→SR→CMP→TASK→E2E graph,
+    DAG, незаполненные templates, реальные build/E2E команды, reporter, isolation/cleanup, hash verify.mjs против каталожного ресурса.
+    До кода модель E2E должна иметь конкретные ожидания. on_tests исправляет модель, не реализацию.
+    Не считать schema pass семантическим доказательством полноты.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+
+    Запиши route строго из объявленных handlers: on_success, on_rework, on_tests, on_srs, on_requirements. При возврате обязательна конкретная rework_instruction.
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-quality@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-acceptance-auditor@3.0
+  - hg-pdlc-qwen-test-designer@3.0
+  - hg-pdlc-qwen-security-reviewer@3.0
+  produced_artifacts:
+  - scope: run
+    path: contract-review.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: command-contract-check
+  on_rework:
+    transition: ai-plan
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: resume_previous_session
+  on_tests:
+    transition: ai-test-model
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+  on_srs:
+    transition: ai-srs
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+  on_requirements:
+    transition: ai-prd
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+- id: command-contract-check
+  title: Машинная проверка schemas, ID и DAG
+  type: command
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-plan
+    path: plan-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    set -euo pipefail
+    rm -f pdlc-run-contract-before.json pdlc-run-contract-receipt.json
+    # Quoted heredoc + json_string: feature/context values are DATA, never shell code.
+    cat > pdlc-run-contract-input.json <<'HG_INPUT_JSON'
+    {"change_id":"${((step["ai-context"].change_id)!"")?json_string}","attempt":${(((step["command-contract-check"].attempt)!0)+1)?c},"node_id":"command-contract-check"}
+    HG_INPUT_JSON
+    : > pdlc-run-contract.log
+    rc=0
+    node tools/hg/verify.mjs snapshot pdlc-run-contract-input.json pdlc-run-contract-before.json >> pdlc-run-contract.log 2>&1 || rc=$?
+    if [ "$rc" -eq 0 ]; then
+      node tools/hg/verify.mjs spec pdlc-run-contract-input.json >> pdlc-run-contract.log 2>&1 || rc=$?
+    fi
+
+    # Receipt creation records result; it does not know the graph or select a next node.
+    node tools/hg/verify.mjs receipt contract pdlc-run-contract-input.json pdlc-run-contract-before.json pdlc-run-contract-receipt.json "$rc" pdlc-run-contract.log -
+    # Only HG SDLC interprets route and controls the transition.
+    node --input-type=module - pdlc-run-contract-receipt.json <<'HG_STEP_JS'
+    import fs from 'node:fs';
+    const r = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+    const s = {step_id:r.node_id, attempt:r.attempt, status:'done',
+      route:r.passed ? 'on_success' : 'on_rework', exit_code:r.exit_code,
+      actions:['Executed contract check; actual evidence: pdlc-run-contract-receipt.json'],
+      rework_instruction:r.passed ? '' : 'contract failed. Read pdlc-run-contract-receipt.json and pdlc-run-contract.log; fix the cause, never suppress exit or weaken acceptance.',
+      feedback_id:r.node_id+':'+r.attempt, basis_hash:r.contract_hash};
+    console.log('STEP_SUMMARY:\n```json\n'+JSON.stringify(s,null,2)+'\n```');
+    HG_STEP_JS
+  produced_artifacts:
+  - scope: run
+    path: pdlc-run-contract-input.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: pdlc-run-contract-before.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: pdlc-run-contract-receipt.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: pdlc-run-contract.log
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-implement
+  on_rework:
+    transition: ai-plan
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+- id: ai-implement
+  title: Реализовать фичу по проверенным требованиям
+  type: ai
+  routing_type: static
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-plan
+    path: plan-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-srs
+    path: srs-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: prd-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-test-model
+    path: test-model-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-code-review
+    path: code-review.md
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-diagnose
+    path: diagnosis.md
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-build
+    path: pdlc-run-build-receipt.json
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    <#assign feedback0 = step["command-build"]!{} />
+    <#if feedback0.rework_instruction?has_content>
+    Замечания из command-build (проверить актуальность finding_id и basis_hash):
+    <#if (feedback0.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback0.rework_instruction}
+    </#if>
+    <#assign feedback1 = step["ai-code-review"]!{} />
+    <#if feedback1.rework_instruction?has_content>
+    Замечания из ai-code-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback1.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback1.rework_instruction}
+    </#if>
+    <#assign feedback2 = step["ai-diagnose"]!{} />
+    <#if feedback2.rework_instruction?has_content>
+    Замечания из ai-diagnose (проверить актуальность finding_id и basis_hash):
+    <#if (feedback2.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback2.rework_instruction}
+    </#if>
+    Следуй плану в текущем CHG. Implementer получает строго назначенные файлы и задачи, parent контролирует общий diff.
+    Создай код/миграции и unit/integration tests по потребности. E2E oracle не менять.
+    Сохрани implementation.md/json с реально изменёнными файлами и покрытием TASK/SR; run implementation-index.md.
+    После реворка исправь finding и заново предъяви весь output contract; build выполнит HG command.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-implementation@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-implementer@3.0
+  produced_artifacts:
+  - scope: project
+    path: docs/changes/*/implementation.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/implementation.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: implementation-index.md
+    required: true
+    modifiable: false
+  expected_mutations:
+  - scope: project
+    path: src/**
+    required: false
+    modifiable: false
+  - scope: project
+    path: apps/**
+    required: false
+    modifiable: false
+  - scope: project
+    path: services/**
+    required: false
+    modifiable: false
+  - scope: project
+    path: packages/**
+    required: false
+    modifiable: false
+  - scope: project
+    path: backend/**
+    required: false
+    modifiable: false
+  - scope: project
+    path: frontend/**
+    required: false
+    modifiable: false
+  - scope: project
+    path: tests/**
+    required: false
+    modifiable: false
+  - scope: project
+    path: migrations/**
+    required: false
+    modifiable: false
+  on_success:
+    transition: command-build
+- id: command-build
+  title: Сборка и исходная регрессия кода
+  type: command
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-implement
+    path: implementation-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    set -euo pipefail
+    rm -f pdlc-run-build-before.json pdlc-run-build-receipt.json
+    # Quoted heredoc + json_string: feature/context values are DATA, never shell code.
+    cat > pdlc-run-build-input.json <<'HG_INPUT_JSON'
+    {"change_id":"${((step["ai-context"].change_id)!"")?json_string}","attempt":${(((step["command-build"].attempt)!0)+1)?c},"node_id":"command-build"}
+    HG_INPUT_JSON
+    : > pdlc-run-build.log
+    rc=0
+    node tools/hg/verify.mjs snapshot pdlc-run-build-input.json pdlc-run-build-before.json >> pdlc-run-build.log 2>&1 || rc=$?
+    if [ "$rc" -eq 0 ]; then
+      timeout 900 bash tools/hg/build.sh - >> pdlc-run-build.log 2>&1 || rc=$?
+    fi
+
+    # Receipt creation records result; it does not know the graph or select a next node.
+    node tools/hg/verify.mjs receipt build pdlc-run-build-input.json pdlc-run-build-before.json pdlc-run-build-receipt.json "$rc" pdlc-run-build.log -
+    # Only HG SDLC interprets route and controls the transition.
+    node --input-type=module - pdlc-run-build-receipt.json <<'HG_STEP_JS'
+    import fs from 'node:fs';
+    const r = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+    const s = {step_id:r.node_id, attempt:r.attempt, status:'done',
+      route:r.passed ? 'on_success' : 'on_rework', exit_code:r.exit_code,
+      actions:['Executed build check; actual evidence: pdlc-run-build-receipt.json'],
+      rework_instruction:r.passed ? '' : 'build failed. Read pdlc-run-build-receipt.json and pdlc-run-build.log; fix the cause, never suppress exit or weaken acceptance.',
+      feedback_id:r.node_id+':'+r.attempt, basis_hash:r.contract_hash};
+    console.log('STEP_SUMMARY:\n```json\n'+JSON.stringify(s,null,2)+'\n```');
+    HG_STEP_JS
+  produced_artifacts:
+  - scope: run
+    path: pdlc-run-build-input.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: pdlc-run-build-before.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: pdlc-run-build-receipt.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: pdlc-run-build.log
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-code-review
+  on_rework:
+    transition: ai-implement
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+- id: ai-code-review
+  title: Независимое ревью изменений
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-implement
+    path: implementation-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-plan
+    path: plan-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-srs
+    path: srs-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-build
+    path: pdlc-run-build-receipt.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    Ревью только change diff и релевантного соседнего кода. Вызови edge-case-hunter, acceptance-auditor, security-reviewer.
+    Сверь действительные изменения с планом, а не только отчётом implementer; build receipt должен быть passed.
+    on_rework: код; on_srs: системное поведение; on_architecture: проектирование; on_requirements: бизнес-смысл.
+    Сохрани code-review.md, не переименовывай дефект теста в улучшение будущего релиза.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+
+    Запиши route строго из объявленных handlers: on_success, on_rework, on_srs, on_architecture, on_requirements. При возврате обязательна конкретная rework_instruction.
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-quality@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-edge-case-hunter@3.0
+  - hg-pdlc-qwen-acceptance-auditor@3.0
+  - hg-pdlc-qwen-security-reviewer@3.0
+  produced_artifacts:
+  - scope: run
+    path: code-review.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-e2e
+  on_rework:
+    transition: ai-implement
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: resume_previous_session
+  on_srs:
+    transition: ai-srs
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+  on_architecture:
+    transition: ai-architecture
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+  on_requirements:
+    transition: ai-prd
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+- id: ai-e2e
+  title: Автоматизировать E2E по ранее заданному oracle
+  type: ai
+  routing_type: static
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-test-model
+    path: test-model-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-implement
+    path: implementation-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-code-review
+    path: code-review.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-plan
+    path: plan-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-diagnose
+    path: diagnosis.md
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    <#assign feedback0 = step["ai-diagnose"]!{} />
+    <#if feedback0.rework_instruction?has_content>
+    Замечания из ai-diagnose (проверить актуальность finding_id и basis_hash):
+    <#if (feedback0.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback0.rework_instruction}
+    </#if>
+    <#assign feedback1 = step["ai-evidence-review"]!{} />
+    <#if feedback1.rework_instruction?has_content>
+    Замечания из ai-evidence-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback1.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback1.rework_instruction}
+    </#if>
+    Напиши все required E2E из модели после реализации. Реальные boundary/components; UI — настоящий браузер.
+    Адаптируй reporter и фикстуры, сохрани полезные tests и e2e-automation.md. Сырые результаты пока не создавать.
+    Тестовые ожидания должны соответствовать AC/SR; ошибочное ожидание возвращается в test-model/SRS, не правится молча.
+    Следующие command-regression и command-e2e выполнят полную проверку на одном текущем snapshot.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-e2e@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-test-designer@3.0
+  - hg-pdlc-qwen-e2e-reviewer@3.0
+  produced_artifacts:
+  - scope: project
+    path: docs/changes/*/e2e-automation.md
+    required: true
+    modifiable: false
+  - scope: run
+    path: e2e-index.md
+    required: true
+    modifiable: false
+  expected_mutations:
+  - scope: project
+    path: tests/**
+    required: false
+    modifiable: false
+  - scope: project
+    path: tools/hg/e2e.sh
+    required: false
+    modifiable: false
+  on_success:
+    transition: command-regression
+- id: command-regression
+  title: Повторить build после автоматизации тестов
+  type: command
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-e2e
+    path: e2e-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    set -euo pipefail
+    rm -f pdlc-run-regression-before.json pdlc-run-regression-receipt.json
+    # Quoted heredoc + json_string: feature/context values are DATA, never shell code.
+    cat > pdlc-run-regression-input.json <<'HG_INPUT_JSON'
+    {"change_id":"${((step["ai-context"].change_id)!"")?json_string}","attempt":${(((step["command-regression"].attempt)!0)+1)?c},"node_id":"command-regression"}
+    HG_INPUT_JSON
+    rm -f pdlc-run-nfr-report.json
+    : > pdlc-run-regression.log
+    rc=0
+    node tools/hg/verify.mjs snapshot pdlc-run-regression-input.json pdlc-run-regression-before.json >> pdlc-run-regression.log 2>&1 || rc=$?
+    if [ "$rc" -eq 0 ]; then
+      timeout 900 bash tools/hg/build.sh pdlc-run-nfr-report.json >> pdlc-run-regression.log 2>&1 || rc=$?
+    fi
+
+    # Receipt creation records result; it does not know the graph or select a next node.
+    node tools/hg/verify.mjs receipt regression pdlc-run-regression-input.json pdlc-run-regression-before.json pdlc-run-regression-receipt.json "$rc" pdlc-run-regression.log pdlc-run-nfr-report.json
+    # Only HG SDLC interprets route and controls the transition.
+    node --input-type=module - pdlc-run-regression-receipt.json <<'HG_STEP_JS'
+    import fs from 'node:fs';
+    const r = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+    const s = {step_id:r.node_id, attempt:r.attempt, status:'done',
+      route:r.passed ? 'on_success' : 'on_rework', exit_code:r.exit_code,
+      actions:['Executed regression check; actual evidence: pdlc-run-regression-receipt.json'],
+      rework_instruction:r.passed ? '' : 'regression failed. Read pdlc-run-regression-receipt.json and pdlc-run-regression.log; fix the cause, never suppress exit or weaken acceptance.',
+      feedback_id:r.node_id+':'+r.attempt, basis_hash:r.contract_hash};
+    console.log('STEP_SUMMARY:\n```json\n'+JSON.stringify(s,null,2)+'\n```');
+    HG_STEP_JS
+  produced_artifacts:
+  - scope: run
+    path: pdlc-run-regression-input.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: pdlc-run-regression-before.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: pdlc-run-regression-receipt.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: pdlc-run-regression.log
+    required: true
+    modifiable: false
+  - scope: run
+    path: pdlc-run-nfr-report.json
+    required: false
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: command-e2e
+  on_rework:
+    transition: ai-diagnose
+    keep_changes: true
+    session_policy: new_session
+- id: command-e2e
+  title: Выполнить реальные E2E и собрать сырые доказательства
+  type: command
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-e2e
+    path: e2e-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-test-model
+    path: test-model-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-regression
+    path: pdlc-run-regression-receipt.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    set -euo pipefail
+    rm -f pdlc-run-e2e-before.json pdlc-run-e2e-receipt.json
+    # Quoted heredoc + json_string: feature/context values are DATA, never shell code.
+    cat > pdlc-run-e2e-input.json <<'HG_INPUT_JSON'
+    {"change_id":"${((step["ai-context"].change_id)!"")?json_string}","attempt":${(((step["command-e2e"].attempt)!0)+1)?c},"node_id":"command-e2e"}
+    HG_INPUT_JSON
+    rm -f pdlc-run-e2e-report.json
+    : > pdlc-run-e2e.log
+    rc=0
+    node tools/hg/verify.mjs snapshot pdlc-run-e2e-input.json pdlc-run-e2e-before.json >> pdlc-run-e2e.log 2>&1 || rc=$?
+    if [ "$rc" -eq 0 ]; then
+      rm -f pdlc-run-e2e-report.json
+      timeout 900 bash tools/hg/e2e.sh pdlc-run-e2e-report.json >> pdlc-run-e2e.log 2>&1 || rc=$?
+    fi
+    if [ ! -f pdlc-run-e2e-report.json ]; then
+      printf '%s\n' '{"runner":"not_started","cases":[],"error":"Fresh E2E report missing"}' > pdlc-run-e2e-report.json
+    fi
+    if [ "$rc" -eq 0 ]; then
+      node tools/hg/verify.mjs e2e pdlc-run-e2e-input.json pdlc-run-e2e-report.json >> pdlc-run-e2e.log 2>&1 || rc=$?
+    fi
+    # Receipt creation records result; it does not know the graph or select a next node.
+    node tools/hg/verify.mjs receipt e2e pdlc-run-e2e-input.json pdlc-run-e2e-before.json pdlc-run-e2e-receipt.json "$rc" pdlc-run-e2e.log pdlc-run-e2e-report.json
+    # Only HG SDLC interprets route and controls the transition.
+    node --input-type=module - pdlc-run-e2e-receipt.json <<'HG_STEP_JS'
+    import fs from 'node:fs';
+    const r = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+    const s = {step_id:r.node_id, attempt:r.attempt, status:'done',
+      route:r.passed ? 'on_success' : 'on_rework', exit_code:r.exit_code,
+      actions:['Executed e2e check; actual evidence: pdlc-run-e2e-receipt.json'],
+      rework_instruction:r.passed ? '' : 'e2e failed. Read pdlc-run-e2e-receipt.json and pdlc-run-e2e.log; fix the cause, never suppress exit or weaken acceptance.',
+      feedback_id:r.node_id+':'+r.attempt, basis_hash:r.contract_hash};
+    console.log('STEP_SUMMARY:\n```json\n'+JSON.stringify(s,null,2)+'\n```');
+    HG_STEP_JS
+  produced_artifacts:
+  - scope: run
+    path: pdlc-run-e2e-input.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: pdlc-run-e2e-before.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: pdlc-run-e2e-receipt.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: pdlc-run-e2e.log
+    required: true
+    modifiable: false
+  - scope: run
+    path: pdlc-run-e2e-report.json
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-evidence-review
+  on_rework:
+    transition: ai-diagnose
+    keep_changes: true
+    session_policy: new_session
+- id: ai-diagnose
+  title: Определить источник сбоя и корректный возврат
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-context
+    path: change-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-regression
+    path: pdlc-run-regression-receipt.json
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-e2e
+    path: pdlc-run-e2e-receipt.json
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-e2e
+    path: pdlc-run-e2e.log
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-evidence-review
+    path: evidence-review.md
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-final
+    path: pdlc-run-final-receipt.json
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: human-exception
+    path: exception.form.json
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_value
+  instruction: |
+    <#assign feedback0 = step["command-e2e"]!{} />
+    <#if feedback0.rework_instruction?has_content>
+    Замечания из command-e2e (проверить актуальность finding_id и basis_hash):
+    <#if (feedback0.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback0.rework_instruction}
+    </#if>
+    <#assign feedback1 = step["command-regression"]!{} />
+    <#if feedback1.rework_instruction?has_content>
+    Замечания из command-regression (проверить актуальность finding_id и basis_hash):
+    <#if (feedback1.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback1.rework_instruction}
+    </#if>
+    <#assign feedback2 = step["ai-evidence-review"]!{} />
+    <#if feedback2.rework_instruction?has_content>
+    Замечания из ai-evidence-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback2.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback2.rework_instruction}
+    </#if>
+    <#assign feedback3 = step["human-exception"]!{} />
+    <#if feedback3.rework_instruction?has_content>
+    Замечания из human-exception (проверить актуальность finding_id и basis_hash):
+    <#if (feedback3.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback3.rework_instruction}
+    </#if>
+    <#assign feedback4 = step["command-final"]!{} />
+    <#if feedback4.rework_instruction?has_content>
+    Замечания из command-final (проверить актуальность finding_id и basis_hash):
+    <#if (feedback4.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback4.rework_instruction}
+    </#if>
+    Прочитай доступные свежие command receipts/logs/review; после human-exception учти решение из формы.
+    Диагностируй code/test-code/oracle/environment/requirements/architecture/SRS, не подавляй проверку.
+    Создай diagnosis.md. on_documents — только ошибка копирования/консолидации после command-final, без source/contract drift. on_environment — ограниченная починка изолированной среды; on_blocked — нужен человек;
+    on_success разрешён ТОЛЬКО для разрешённого environmental false alarm и ведёт на повтор regression, а не final.
+    При отсутствии достаточных данных выбирай blocked, а не случайный implementation rework.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+
+    Запиши route строго из объявленных handlers: on_success, on_code, on_tests, on_oracle, on_environment, on_requirements, on_srs, on_architecture, on_documents, on_blocked. При возврате обязательна конкретная rework_instruction.
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-diagnosis@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-edge-case-hunter@3.0
+  - hg-pdlc-qwen-e2e-reviewer@3.0
+  produced_artifacts:
+  - scope: run
+    path: diagnosis.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: command-regression
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+  on_code:
+    transition: ai-implement
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: resume_previous_session
+  on_tests:
+    transition: ai-e2e
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+  on_oracle:
+    transition: ai-test-model
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+  on_environment:
+    transition: ai-environment
+  on_requirements:
+    transition: ai-prd
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+  on_srs:
+    transition: ai-srs
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+  on_architecture:
+    transition: ai-architecture
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+  on_documents:
+    transition: ai-consolidate
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+  on_blocked:
+    transition: ai-exception
+- id: ai-environment
+  title: Исправить только тестовую среду
+  type: ai
+  routing_type: static
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-diagnose
+    path: diagnosis.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-plan
+    path: plan-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    <#assign feedback0 = step["ai-diagnose"]!{} />
+    <#if feedback0.rework_instruction?has_content>
+    Замечания из ai-diagnose (проверить актуальность finding_id и basis_hash):
+    <#if (feedback0.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback0.rework_instruction}
+    </#if>
+    Из diagnosis исправь только readiness/ports/test dependencies/cleanup/config. Не выключай auth, не меняй AC/SR и assertions.
+    Все полезные script/config изменения остаются project; summary environment-repair.md — run.
+    Далее обязательно regression и E2E заново. Недостаточные полномочия не обходить.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-diagnosis@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-e2e-reviewer@3.0
+  produced_artifacts:
+  - scope: run
+    path: environment-repair.md
+    required: true
+    modifiable: false
+  expected_mutations:
+  - scope: project
+    path: tools/hg/*.sh
+    required: false
+    modifiable: false
+  - scope: project
+    path: tests/**
+    required: false
+    modifiable: false
+  on_success:
+    transition: command-regression
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: new_session
+- id: ai-exception
+  title: Предъявить блокер человеку
+  type: ai
+  routing_type: static
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-diagnose
+    path: diagnosis.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-context
+    path: change-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    <#assign feedback0 = step["human-exception"]!{} />
+    <#if feedback0.rework_instruction?has_content>
+    Замечания из human-exception (проверить актуальность finding_id и basis_hash):
+    <#if (feedback0.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback0.rework_instruction}
+    </#if>
+    Из diagnosis создай exception.form.json в run и полезный blocker.md в текущем CHG.
+    Покажи наблюдение, последствия, варианты и какое решение требуется. Секреты не вводятся в форму.
+    Необратимую/внешнюю операцию не выполнять по молчанию. После ответа diagnosis перепроверяет причину.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-diagnosis@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-acceptance-auditor@3.0
+  produced_artifacts:
+  - scope: run
+    path: exception.form.json
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/blocker.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: human-exception
+- id: human-exception
+  title: Решить исключительный блокер
+  type: human_input
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-exception
+    path: exception.form.json
+    scope: run
+    required: true
+    modifiable: true
+    transfer_mode: by_ref
+  instruction: Заполните обязательные поля. Пустое поле не означает согласие с рекомендацией. Не вводите секреты.
+    Нажмите Submit.
+  allowed_roles:
+  - PRODUCT_OWNER
+  produced_artifacts:
+  - scope: run
+    path: exception.form.json
+    required: true
+    modifiable: true
+  expected_mutations: []
+  on_submit:
+    transition: ai-diagnose
+  on_rework:
+    transition: ai-exception
+- id: ai-evidence-review
+  title: Проверить реальные результаты против приёмки
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-prd
+    path: prd-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-srs
+    path: srs-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-test-model
+    path: test-model-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-regression
+    path: pdlc-run-regression-receipt.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-e2e
+    path: pdlc-run-e2e-receipt.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-e2e
+    path: pdlc-run-e2e-report.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-e2e
+    path: pdlc-run-e2e.log
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    Вызови acceptance-auditor и e2e-reviewer. Проверь переданные regression/e2e receipts, report и log, actual case IDs,
+    chain, требуемые AC/SR, no skipped/flaky, snapshot hashes. Проверка намерения не равна проверке результата.
+    Сравни всё с текущими файлами; при drift/неполноте on_rework → diagnosis. Не генерируй новый passed report.
+    Сохрани evidence-review.md; on_success означает готовность СОХРАНИТЬ полезные evidence, не выпуск продукта.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+
+    Запиши route строго из объявленных handlers: on_success, on_rework, on_blocked. При возврате обязательна конкретная rework_instruction.
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-quality@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-acceptance-auditor@3.0
+  - hg-pdlc-qwen-e2e-reviewer@3.0
+  produced_artifacts:
+  - scope: run
+    path: evidence-review.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-consolidate
+  on_rework:
+    transition: ai-diagnose
+    keep_changes: true
+    session_policy: new_session
+  on_blocked:
+    transition: terminal-failed
+- id: ai-consolidate
+  title: Сохранить полезные evidence и актуализировать продукт
+  type: ai
+  routing_type: static
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-context
+    path: change-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-evidence-review
+    path: evidence-review.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-regression
+    path: pdlc-run-nfr-report.json
+    scope: run
+    required: false
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-regression
+    path: pdlc-run-regression-receipt.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-e2e
+    path: pdlc-run-e2e-receipt.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-e2e
+    path: pdlc-run-e2e-report.json
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: command-e2e
+    path: pdlc-run-e2e.log
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-prd
+    path: prd-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-architecture
+    path: architecture-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-srs
+    path: srs-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-test-model
+    path: test-model-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    <#assign feedback0 = step["command-final"]!{} />
+    <#if feedback0.rework_instruction?has_content>
+    Замечания из command-final (проверить актуальность finding_id и basis_hash):
+    <#if (feedback0.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback0.rework_instruction}
+    </#if>
+    <#assign feedback1 = step["ai-diagnose"]!{} />
+    <#if feedback1.rework_instruction?has_content>
+    Замечания из ai-diagnose (проверить актуальность finding_id и basis_hash):
+    <#if (feedback1.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback1.rework_instruction}
+    </#if>
+    Сохрани финальные regression/e2e receipts и e2e report в project evidence как точные копии переданных run artifacts.
+    Если system.nfr непустой, скопируй свежий pdlc-run-nfr-report.json из command-regression в project evidence/nfr-report.json.
+    Скопируй полезный e2e.log с policy redaction, не меняя raw JSON. Запиши verification.md, update product current.md/index.json,
+    baseline/architecture/system/quality canonical docs только по затронутому delta, сохраняя unrelated content.
+    Обнови change.json.status=e2e_verified_not_released. Не менять код, тесты, contracts, PRD/SRS/модель.
+    Сохрани final-index.md; финальный command ещё проверит hashes/copies/current index. Не выполнять release.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-consolidation@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-acceptance-auditor@3.0
+  produced_artifacts:
+  - scope: project
+    path: docs/changes/*/verification.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/evidence/regression-receipt.json
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/evidence/e2e-receipt.json
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/evidence/e2e-report.json
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/evidence/e2e.log
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/evidence/nfr-report.json
+    required: false
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/evidence/log-redaction.json
+    required: false
+    modifiable: false
+  - scope: project
+    path: docs/product/current.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/business/current.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/architecture/current.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/system/current.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/quality/current.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/index.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: final-index.md
+    required: true
+    modifiable: false
+  expected_mutations:
+  - scope: project
+    path: docs/changes/*/change.json
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/baseline.md
+    required: false
+    modifiable: false
+  - scope: project
+    path: docs/product/business/capabilities.md
+    required: false
+    modifiable: false
+  - scope: project
+    path: docs/product/business/rules.md
+    required: false
+    modifiable: false
+  - scope: project
+    path: docs/product/architecture/as-is.md
+    required: false
+    modifiable: false
+  - scope: project
+    path: docs/product/architecture/components.json
+    required: false
+    modifiable: false
+  - scope: project
+    path: docs/product/system/as-is-srs.md
+    required: false
+    modifiable: false
+  - scope: project
+    path: docs/product/quality/test-inventory.md
+    required: false
+    modifiable: false
+  - scope: project
+    path: docs/product/glossary.md
+    required: false
+    modifiable: false
+  on_success:
+    transition: command-final
+- id: command-final
+  title: Проверить сохранённый итог без повторной генерации evidence
+  type: command
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-consolidate
+    path: final-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    set -euo pipefail
+    rm -f pdlc-run-final-before.json pdlc-run-final-receipt.json
+    # Quoted heredoc + json_string: feature/context values are DATA, never shell code.
+    cat > pdlc-run-final-input.json <<'HG_INPUT_JSON'
+    {"change_id":"${((step["ai-context"].change_id)!"")?json_string}","attempt":${(((step["command-final"].attempt)!0)+1)?c},"node_id":"command-final"}
+    HG_INPUT_JSON
+    : > pdlc-run-final.log
+    rc=0
+    node tools/hg/verify.mjs snapshot pdlc-run-final-input.json pdlc-run-final-before.json >> pdlc-run-final.log 2>&1 || rc=$?
+    if [ "$rc" -eq 0 ]; then
+      node tools/hg/verify.mjs final pdlc-run-final-input.json >> pdlc-run-final.log 2>&1 || rc=$?
+    fi
+
+    # Receipt creation records result; it does not know the graph or select a next node.
+    node tools/hg/verify.mjs receipt final pdlc-run-final-input.json pdlc-run-final-before.json pdlc-run-final-receipt.json "$rc" pdlc-run-final.log -
+    # Only HG SDLC interprets route and controls the transition.
+    node --input-type=module - pdlc-run-final-receipt.json <<'HG_STEP_JS'
+    import fs from 'node:fs';
+    const r = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+    const input=JSON.parse(fs.readFileSync('pdlc-run-final-input.json','utf8'));
+    if(!/^CHG-[a-z0-9-]{1,100}$/.test(input.change_id))throw new Error('Invalid change ID');
+    const target='docs/changes/'+input.change_id+'/evidence/final-check-receipt.json';
+    fs.mkdirSync('docs/changes/'+input.change_id+'/evidence',{recursive:true});
+    fs.writeFileSync(target,JSON.stringify(r,null,2)+'\n');
+    const s = {step_id:r.node_id, attempt:r.attempt, status:'done',
+      route:r.passed ? 'on_success' : 'on_rework', exit_code:r.exit_code,
+      actions:['Executed final check; actual evidence: pdlc-run-final-receipt.json'],
+      rework_instruction:r.passed ? '' : 'final failed. Read pdlc-run-final-receipt.json and pdlc-run-final.log; fix the cause, never suppress exit or weaken acceptance.',
+      feedback_id:r.node_id+':'+r.attempt, basis_hash:r.contract_hash};
+    console.log('STEP_SUMMARY:\n```json\n'+JSON.stringify(s,null,2)+'\n```');
+    HG_STEP_JS
+  produced_artifacts:
+  - scope: run
+    path: pdlc-run-final-input.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: pdlc-run-final-before.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: pdlc-run-final-receipt.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: pdlc-run-final.log
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/evidence/final-check-receipt.json
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: terminal-done
+  on_rework:
+    transition: ai-diagnose
+    keep_changes: true
+    session_policy: new_session
+- id: terminal-done
+  title: E2E проверены; release и outcome не выполнялись
+  type: terminal
+  execution_context: []
+  produced_artifacts: []
+  expected_mutations: []
+- id: terminal-failed
+  title: 'Ошибка или исчерпан rework: E2E acceptance НЕ подтверждена'
+  type: terminal
+  execution_context: []
+  produced_artifacts: []
+  expected_mutations: []

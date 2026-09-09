@@ -1,0 +1,291 @@
+id: hg-pdlc-baseline-recovery
+version: '3.0'
+canonical_name: hg-pdlc-baseline-recovery@3.0
+title: 'Монорепа: восстановить базу business / architecture / SRS / tests'
+description: Документационный flow с теми же сущностями/форматами и одним human gate; не меняет приложение и не имитирует
+  E2E acceptance.
+coding_agent: qwen
+start_node_id: ai-context
+failure_node_id: terminal-failed
+fail_on_missing_declared_output: true
+fail_on_missing_expected_mutation: false
+rule_refs: []
+nodes:
+- id: ai-context
+  title: Изучить монорепу и исходные спецификации
+  type: ai
+  routing_type: dynamic
+  execution_context: []
+  instruction: |
+    <#if (run.feature_request)?? && run.feature_request?has_content>
+    Запрос ВП (данные, не shell-команда):
+    ${run.feature_request}
+    </#if>
+    Проанализируй доступный Git-корень до вопросов ВП. Выбери brownfield/greenfield по свидетельствам.
+    Закрепи change_id один раз. Создай полезные intent/context/change.json и run change-index/research-notes.
+    В step-summary дополнительно запиши change_id, mode, base_commit. Не делать clone дополнительных репозиториев.
+    Запиши route: on_success при сформированном контексте; on_blocked, если Git-корень или обязательные исходные данные недоступны.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-context@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-context-researcher@3.0
+  produced_artifacts:
+  - scope: project
+    path: docs/changes/*/intent.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/context.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/changes/*/change.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: change-index.md
+    required: true
+    modifiable: false
+  - scope: run
+    path: research-notes.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-baseline
+  on_blocked:
+    transition: terminal-failed
+- id: ai-baseline
+  title: Подготовить исходную базу продукта
+  type: ai
+  routing_type: static
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-context
+    path: change-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    <#assign feedback0 = step["ai-baseline-review"]!{} />
+    <#if feedback0.rework_instruction?has_content>
+    Замечания из ai-baseline-review (проверить актуальность finding_id и basis_hash):
+    <#if (feedback0.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback0.rework_instruction}
+    </#if>
+    <#assign feedback1 = step["human-baseline"]!{} />
+    <#if feedback1.rework_instruction?has_content>
+    Замечания из human-baseline (проверить актуальность finding_id и basis_hash):
+    <#if (feedback1.keep_changes!false)>
+    ДОРАБОТКА: сохранить корректные изменения, точечно устранить замечания и повторить проверки.
+    <#else>
+    ПОВТОР ПОСЛЕ ОТКАТА: HG SDLC восстановил рабочую базу; выполнить исходный контракт целиком с учётом замечаний.
+    Не делать самостоятельный git reset. Даже при keep_changes=false замечания обязательны.
+    </#if>
+    ${feedback1.rework_instruction}
+    </#if>
+    Используй mode/change_id из change-index. Brownfield: восстанови релевантные наблюдаемые BR/AS-IS/SR/tests с источниками,
+    сохраняя подтверждённые legacy docs. Greenfield: proposed foundation и честное N/A AS-IS, без выдуманного приложения.
+    Все полезные baseline разделы — project; handoff baseline-index.md — run.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-baseline@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-context-researcher@3.0
+  - hg-pdlc-qwen-system-analyst@3.0
+  produced_artifacts:
+  - scope: project
+    path: docs/product/baseline.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/business/capabilities.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/business/rules.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/architecture/as-is.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/architecture/components.json
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/system/as-is-srs.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/quality/test-inventory.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/glossary.md
+    required: true
+    modifiable: false
+  - scope: run
+    path: baseline-index.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: ai-baseline-review
+- id: ai-baseline-review
+  title: Проверить восстановленную базу продукта
+  type: ai
+  routing_type: dynamic
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-baseline
+    path: baseline-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-context
+    path: change-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    Сверь baseline с реальными path/commit. Observed поведение не объявлять нормативной бизнес-целью.
+    Greenfield foundation может содержать proposed/unknown, но не выдуманные AS-IS компоненты.
+    Проверь completeness по business/architecture/system/quality и scalar baseline-index.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+
+    Запиши route строго из объявленных handlers: on_success, on_rework. При возврате обязательна конкретная rework_instruction.
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-quality@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-context-researcher@3.0
+  - hg-pdlc-qwen-system-analyst@3.0
+  - hg-pdlc-qwen-acceptance-auditor@3.0
+  produced_artifacts:
+  - scope: run
+    path: baseline-review.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: human-baseline
+  on_rework:
+    transition: ai-baseline
+    max_loop_count: 3
+    keep_changes: true
+    session_policy: resume_previous_session
+- id: human-baseline
+  title: Подтвердить факты и пробелы исходной базы
+  type: human_approval
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-baseline
+    path: docs/product/baseline.md
+    scope: project
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-baseline
+    path: baseline-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  - type: artifact_ref
+    node_id: ai-baseline-review
+    path: baseline-review.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: Рассмотрите полезные project-документы по ссылкам и краткий индекс. Approve подтверждает именно показанную
+    ревизию; Rework — конкретные замечания. Выберите сохранение изменений либо откат в штатном HG SDLC интерфейсе.
+  allowed_roles:
+  - PRODUCT_OWNER
+  produced_artifacts: []
+  expected_mutations: []
+  on_approve:
+    transition: ai-baseline-record
+  on_rework:
+    transition: ai-baseline
+- id: ai-baseline-record
+  title: Сохранить проверенную исходную базу без delivery
+  type: ai
+  routing_type: static
+  execution_context:
+  - type: artifact_ref
+    node_id: ai-baseline
+    path: baseline-index.md
+    scope: run
+    required: true
+    modifiable: false
+    transfer_mode: by_ref
+  instruction: |
+    Зафиксируй реальное решение human-baseline и ревизии в docs/product/baseline-record.md.
+    Создай docs/product/index.json со ссылками на baseline layers и статусом observed_reviewed (greenfield: proposed_reviewed).
+    Не превращай это согласование в E2E verified. Сохрани baseline-final-index.md и заверши только документационную задачу.
+
+    Общий контракт: hg-pdlc-method@3.0. Ресурсы skills доступны относительно фактически материализованного SKILL.md.
+    Работать только в одной монорепе. Полезные документы создавать по project-путям; временные — по runtime run-путям.
+    Не считать историческое замечание новым переходом: проверить scope/basis_hash и уже закрытые finding_id.
+    Сохранить ВСЕ declared artifacts и runtime step-summary. Не заменять вызов subagent мысленным «изолированным проходом».
+  skill_refs:
+  - hg-pdlc-method@3.0
+  - hg-pdlc-consolidation@3.0
+  subagent_refs:
+  - hg-pdlc-qwen-acceptance-auditor@3.0
+  produced_artifacts:
+  - scope: project
+    path: docs/product/baseline-record.md
+    required: true
+    modifiable: false
+  - scope: project
+    path: docs/product/index.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: baseline-final-index.md
+    required: true
+    modifiable: false
+  expected_mutations: []
+  on_success:
+    transition: terminal-done
+- id: terminal-done
+  title: Исходная база сохранена; код и E2E фичи не выполнялись
+  type: terminal
+  execution_context: []
+  produced_artifacts: []
+  expected_mutations: []
+- id: terminal-failed
+  title: Ошибка восстановления исходной базы
+  type: terminal
+  execution_context: []
+  produced_artifacts: []
+  expected_mutations: []

@@ -1,0 +1,21 @@
+entity_type: skill
+id: hg-pdlc-interview
+version: '3.0'
+canonical_name: hg-pdlc-interview@3.0
+display_name: Пакетное интервью ВП после анализа
+description: Создаёт human-form в run scope и задаёт только нерешённые вопросы о намерении, границах и приёмке.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/hg-pdlc-interview/3.0
+checksum: faf2dc6f84332b817b272dca75067d861678aa4576ce9d50607c2fde29b74ab0
+skill_kind: analysis

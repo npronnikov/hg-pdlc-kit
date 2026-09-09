@@ -1,0 +1,21 @@
+entity_type: skill
+id: hg-pdlc-plan
+version: '3.0'
+canonical_name: hg-pdlc-plan@3.0
+display_name: План, контракты команд и проверочные ресурсы
+description: Готовит задачи по модулям монорепы и обычные проверочные команды для command-нод HG SDLC.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/hg-pdlc-plan/3.0
+checksum: 50e7cac9624c34671aabd3976e53ec9cdb755ab30796d48b31115019a243640a
+skill_kind: analysis

@@ -1,0 +1,151 @@
+{
+  "runner": "node-assert-http-e2e",
+  "started_at": "2026-09-09T16:16:56.581Z",
+  "finished_at": "2026-09-09T16:16:59.665Z",
+  "environment": {
+    "kind": "isolated-local",
+    "real_components": [
+      "External HTTP client",
+      "Ticket API",
+      "SQLite"
+    ],
+    "external_simulators": []
+  },
+  "cases": [
+    {
+      "id": "E2E-001",
+      "status": "passed",
+      "attempts": 1,
+      "duration_ms": 413,
+      "assertions": [
+        "Owner PATCH returns 200/high/version=2",
+        "Subsequent GET returns persisted high"
+      ],
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ]
+    },
+    {
+      "id": "E2E-002",
+      "status": "passed",
+      "attempts": 1,
+      "duration_ms": 549,
+      "assertions": [
+        "Priority survives application process restart with same on-disk DB"
+      ],
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ]
+    },
+    {
+      "id": "E2E-003",
+      "status": "passed",
+      "attempts": 1,
+      "duration_ms": 319,
+      "assertions": [
+        "Other owner GET/PATCH return 404 without object disclosure",
+        "Owner reads unchanged data afterwards"
+      ],
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ]
+    },
+    {
+      "id": "E2E-004",
+      "status": "passed",
+      "attempts": 1,
+      "duration_ms": 336,
+      "assertions": [
+        "Missing and invalid tokens return 401",
+        "Unauthorized requests do not mutate data"
+      ],
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ]
+    },
+    {
+      "id": "E2E-005",
+      "status": "passed",
+      "attempts": 1,
+      "duration_ms": 289,
+      "assertions": [
+        "Unknown enum returns 400",
+        "Rejected request preserves priority and version"
+      ],
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ]
+    },
+    {
+      "id": "E2E-006",
+      "status": "passed",
+      "attempts": 1,
+      "duration_ms": 300,
+      "assertions": [
+        "Malformed JSON, missing/invalid version and extra fields are rejected with 400",
+        "Invalid inputs leave record unchanged",
+        "Wrong content type returns 415; oversize body returns 413"
+      ],
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ]
+    },
+    {
+      "id": "E2E-007",
+      "status": "failed",
+      "attempts": 1,
+      "duration_ms": 299,
+      "assertions": [
+        "Concurrent requests with same version produce exactly one 200 and one 409",
+        "Winner persists and version increments only once"
+      ],
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ]
+    },
+    {
+      "id": "E2E-008",
+      "status": "passed",
+      "attempts": 1,
+      "duration_ms": 312,
+      "assertions": [
+        "Legacy table migrates preserving id/title",
+        "Existing records have default normal/version=1"
+      ],
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ]
+    },
+    {
+      "id": "E2E-009",
+      "status": "passed",
+      "attempts": 1,
+      "duration_ms": 265,
+      "assertions": [
+        "Missing object returns same 404 error as inaccessible object",
+        "No existing ticket is changed"
+      ],
+      "chain": [
+        "External HTTP client",
+        "Ticket API",
+        "SQLite"
+      ]
+    }
+  ]
+}

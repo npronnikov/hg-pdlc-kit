@@ -1,0 +1,236 @@
+[
+  {
+    "file": "hg-pdlc-baseline-recovery--ai-context.ftl",
+    "flow": "hg-pdlc-baseline-recovery",
+    "node": "ai-context",
+    "source_sha256": "8e67e790a96f6f82c1011542ae5d5f8e7953e3c1fcc927d198d30658bc061054"
+  },
+  {
+    "file": "hg-pdlc-baseline-recovery--ai-baseline.ftl",
+    "flow": "hg-pdlc-baseline-recovery",
+    "node": "ai-baseline",
+    "source_sha256": "8673a92dc0b2f374c6b77acf603651af67fe7c3c2423c5c156104ec721ad9720"
+  },
+  {
+    "file": "hg-pdlc-catalog-smoke--ai-smoke.ftl",
+    "flow": "hg-pdlc-catalog-smoke",
+    "node": "ai-smoke",
+    "source_sha256": "e637d97542358a1571d7af349441875c0044d87e04024998cb019c74122652ed"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--ai-context.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "ai-context",
+    "source_sha256": "8e67e790a96f6f82c1011542ae5d5f8e7953e3c1fcc927d198d30658bc061054"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--ai-interview.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "ai-interview",
+    "source_sha256": "efe32a1f09a398f09bbfe6a13d08c9f0c7657679621a1dbff31f05b0ced9d9c9"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--ai-prd.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "ai-prd",
+    "source_sha256": "8ab236df1a7d43ea43a729f416451c81cf61dfa14f691a39f91c65e45bd69395"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--ai-architecture.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "ai-architecture",
+    "source_sha256": "6ed27d16276b10d0f8f2d271ed282cd82cb1613fa7bcb4691c9d3b3340b5eb8f"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--ai-srs.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "ai-srs",
+    "source_sha256": "df62434a5b1a9cdd722bafc377cd0e94e5f80db2225d6e9cd230bb5608979ebe"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--ai-test-model.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "ai-test-model",
+    "source_sha256": "240ebcdf9fe12685c6a10bd32e4166773a33b953e96180e6776a746dba2163e9"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--ai-plan.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "ai-plan",
+    "source_sha256": "9bb24e36e29e03ee17e7f07ae66b4bd4ef91f0090fcb04d84c940c83b459e9ed"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--command-contract-check.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "command-contract-check",
+    "source_sha256": "bab6ec35000c27fb1f5611cb22a0c1bc7acf322dd10339db3258d6ee27615480"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--ai-implement.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "ai-implement",
+    "source_sha256": "0555c1e55e64dd787e8a002e03a3a5ba902cd0ded84c791345b3eaa44266d7d7"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--command-build.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "command-build",
+    "source_sha256": "e2de4e13e77298b09f2e91e27c0f29672e8b9d95acca35b0b5794f4fd7949613"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--ai-e2e.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "ai-e2e",
+    "source_sha256": "f2953e829079c1f6a0d04f272b12f402f5878bb21c95e36aa0fed5e9fa3a1416"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--command-regression.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "command-regression",
+    "source_sha256": "b5133f2e1fc64532a5d1b62146cf8b74a4fad4488e69cfbcab379ecb31cc6b99"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--command-e2e.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "command-e2e",
+    "source_sha256": "463d197665dd375b7dd01dac241b5c8993b476aeefb78dc20e747a7b7e51a05d"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--ai-diagnose.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "ai-diagnose",
+    "source_sha256": "f05447937fe3373915c9b918c71e223830fe5c47f6b43dd4ef3d1b8763e94619"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--ai-environment.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "ai-environment",
+    "source_sha256": "ce9cb8b745ebc2b0b1855f879188219209b3ae52d61c591c3fda38cb461f05d5"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--ai-exception.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "ai-exception",
+    "source_sha256": "24d3692b497b7eee8b1ca7bed6c5bf257f1ea2795e42d9ece525d877229fb013"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--ai-consolidate.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "ai-consolidate",
+    "source_sha256": "cad5123ca8a5833799b0b5f76df63c6d026f7de3ecf1ba0a924d16b06961bafc"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e--command-final.ftl",
+    "flow": "hg-pdlc-feature-e2e",
+    "node": "command-final",
+    "source_sha256": "6491056921ef2050feb1735fba224852e5f72ebd37cf3bb6bc122a2a1e1d0d2b"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--ai-context.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "ai-context",
+    "source_sha256": "8e67e790a96f6f82c1011542ae5d5f8e7953e3c1fcc927d198d30658bc061054"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--ai-interview.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "ai-interview",
+    "source_sha256": "efe32a1f09a398f09bbfe6a13d08c9f0c7657679621a1dbff31f05b0ced9d9c9"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--ai-prd.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "ai-prd",
+    "source_sha256": "8ab236df1a7d43ea43a729f416451c81cf61dfa14f691a39f91c65e45bd69395"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--ai-architecture.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "ai-architecture",
+    "source_sha256": "6ed27d16276b10d0f8f2d271ed282cd82cb1613fa7bcb4691c9d3b3340b5eb8f"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--ai-srs.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "ai-srs",
+    "source_sha256": "41d7e4e8b68ce8c71d8ab90f3ebd871fa7d78b36a74034f6833e1e856d28caa2"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--ai-test-model.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "ai-test-model",
+    "source_sha256": "240ebcdf9fe12685c6a10bd32e4166773a33b953e96180e6776a746dba2163e9"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--ai-plan.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "ai-plan",
+    "source_sha256": "9bb24e36e29e03ee17e7f07ae66b4bd4ef91f0090fcb04d84c940c83b459e9ed"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--command-contract-check.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "command-contract-check",
+    "source_sha256": "bab6ec35000c27fb1f5611cb22a0c1bc7acf322dd10339db3258d6ee27615480"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--ai-implement.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "ai-implement",
+    "source_sha256": "0555c1e55e64dd787e8a002e03a3a5ba902cd0ded84c791345b3eaa44266d7d7"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--command-build.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "command-build",
+    "source_sha256": "e2de4e13e77298b09f2e91e27c0f29672e8b9d95acca35b0b5794f4fd7949613"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--ai-e2e.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "ai-e2e",
+    "source_sha256": "f2953e829079c1f6a0d04f272b12f402f5878bb21c95e36aa0fed5e9fa3a1416"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--command-regression.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "command-regression",
+    "source_sha256": "b5133f2e1fc64532a5d1b62146cf8b74a4fad4488e69cfbcab379ecb31cc6b99"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--command-e2e.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "command-e2e",
+    "source_sha256": "463d197665dd375b7dd01dac241b5c8993b476aeefb78dc20e747a7b7e51a05d"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--ai-diagnose.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "ai-diagnose",
+    "source_sha256": "f05447937fe3373915c9b918c71e223830fe5c47f6b43dd4ef3d1b8763e94619"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--ai-environment.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "ai-environment",
+    "source_sha256": "ce9cb8b745ebc2b0b1855f879188219209b3ae52d61c591c3fda38cb461f05d5"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--ai-exception.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "ai-exception",
+    "source_sha256": "24d3692b497b7eee8b1ca7bed6c5bf257f1ea2795e42d9ece525d877229fb013"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--ai-consolidate.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "ai-consolidate",
+    "source_sha256": "cad5123ca8a5833799b0b5f76df63c6d026f7de3ecf1ba0a924d16b06961bafc"
+  },
+  {
+    "file": "hg-pdlc-feature-e2e-governed--command-final.ftl",
+    "flow": "hg-pdlc-feature-e2e-governed",
+    "node": "command-final",
+    "source_sha256": "6491056921ef2050feb1735fba224852e5f72ebd37cf3bb6bc122a2a1e1d0d2b"
+  }
+]

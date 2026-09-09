@@ -1,0 +1,9 @@
+{
+  "architecture_sha256": "4157b2515e5e292a8690553f9575092a61f4a482122ccf8fd6e72a419e039397",
+  "requires_human": true,
+  "decision": "approved",
+  "mode": "risk_adaptive",
+  "gate": "human-architecture",
+  "origin": "DEMO_FIXTURE_NOT_LIVE_HG_EVENT",
+  "reason": "Write authorization changes: risk gate applicable"
+}

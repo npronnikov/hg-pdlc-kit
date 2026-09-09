@@ -1,0 +1,16 @@
+{
+  "node_id": "command-regression",
+  "attempt": 1,
+  "stage": "regression",
+  "passed": true,
+  "exit_code": 0,
+  "started_at": "2026-09-09T16:17:02.708Z",
+  "finished_at": "2026-09-09T16:17:03.786Z",
+  "source_hash": "0755c486d642fd3741190f64765ce715790696249eeda7616f07c5dfa2a054af",
+  "contract_hash": "33dd418ad5877ea86bed544227ce9f3822884246409fb645d5639d1ba02c3792",
+  "before_source_hash": "0755c486d642fd3741190f64765ce715790696249eeda7616f07c5dfa2a054af",
+  "before_contract_hash": "33dd418ad5877ea86bed544227ce9f3822884246409fb645d5639d1ba02c3792",
+  "log_sha256": "cd18d63ec2096ccfedac89275c04c89286b26d76a5e862955e7d5ea4617513ee",
+  "report_sha256": null,
+  "problems": []
+}

@@ -1,0 +1,17 @@
+{"check":"e2e","passed":true,"problems":[]}
+STEP_SUMMARY:
+```json
+{
+  "step_id": "command-e2e",
+  "attempt": 1,
+  "status": "done",
+  "route": "on_success",
+  "exit_code": 0,
+  "actions": [
+    "Executed e2e check; actual evidence: pdlc-run-e2e-receipt.json"
+  ],
+  "rework_instruction": "",
+  "feedback_id": "command-e2e:1",
+  "basis_hash": "33dd418ad5877ea86bed544227ce9f3822884246409fb645d5639d1ba02c3792"
+}
+```

@@ -1,0 +1,21 @@
+entity_type: skill
+id: hg-pdlc-context
+version: '3.0'
+canonical_name: hg-pdlc-context@3.0
+display_name: Контекст монорепы до интервью
+description: Изучает запрос, код и продуктовые спецификации; закрепляет change_id, baseline и точные источники.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/hg-pdlc-context/3.0
+checksum: 909319cc08e79c22fccdac1e0c98b41d33f96095e90deec1ee8b5f7bf18110b3
+skill_kind: analysis

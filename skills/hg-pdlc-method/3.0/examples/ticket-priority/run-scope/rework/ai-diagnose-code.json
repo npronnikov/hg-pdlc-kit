@@ -1,0 +1,10 @@
+{
+  "step_id": "ai-diagnose",
+  "attempt": 1,
+  "status": "done",
+  "route": "on_code",
+  "keep_changes": true,
+  "feedback_id": "DEMO-F-CODE-007",
+  "rework_instruction": "F-CODE-007: conditional UPDATE должен проверять version. SR-007/E2E-007 ожидают один 200 и один 409, а не два 200. Исправить код, повторить build, review и E2E.",
+  "origin": "illustrative root-cause example; does not claim the final code failed"
+}

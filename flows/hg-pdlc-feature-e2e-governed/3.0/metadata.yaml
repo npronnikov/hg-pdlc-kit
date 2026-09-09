@@ -1,0 +1,23 @@
+entity_type: flow
+id: hg-pdlc-feature-e2e-governed
+version: '3.0'
+canonical_name: hg-pdlc-feature-e2e-governed@3.0
+display_name: 'Монорепа: тот же процесс с обязательным архитектурным gate'
+description: Полный flow с обязательным техническим approval после архитектуры; остальные контракты и scope совпадают
+  с основным.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- monorepo
+- qwen
+- e2e
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: flows/hg-pdlc-feature-e2e-governed/3.0
+checksum: 8a59cf821d3c6b4ad88773da43402965f7be9fa1f3d9e3a005f5f3519cc4cf64
+flow_kind: delivery
+risk_level: high
