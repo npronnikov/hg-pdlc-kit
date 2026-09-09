@@ -1,0 +1,21 @@
+entity_type: skill
+id: pdlc-integrity
+version: '3.0'
+canonical_name: pdlc-integrity@3.0
+display_name: Детерминированные проверки
+description: Детерминированные проверки.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-integrity/3.0
+checksum: f37e7c875592af40a5a4ee3c408bf39df3c1cd9c39a6a038a4da6d4ca86c0b1c
+skill_kind: analysis

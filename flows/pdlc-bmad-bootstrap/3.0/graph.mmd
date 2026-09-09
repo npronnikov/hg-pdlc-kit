@@ -1,0 +1,26 @@
+flowchart TD
+  command_prepare["command-prepare<br/>Подготовить project verifier и исходный снимок"]
+  command_prepare -->|on_success| ai_baseline
+  ai_baseline["ai-baseline<br/>Восстановить as-is базу одного монорепозитория"]
+  ai_baseline -->|on_success| human_baseline_interview
+  ai_baseline -->|on_blocked| terminal_blocked
+  human_baseline_interview["human-baseline-interview<br/>Уточнить противоречия восстановленной базы"]
+  human_baseline_interview -->|on_submit| ai_baseline_refine
+  human_baseline_interview -->|on_rework| ai_baseline
+  ai_baseline_refine["ai-baseline-refine<br/>Перенести решения ВП в полезную базу"]
+  ai_baseline_refine -->|on_success| command_baseline_check
+  ai_baseline_refine -->|on_questions| ai_baseline
+  ai_baseline_refine -->|on_blocked| terminal_blocked
+  command_baseline_check["command-baseline-check<br/>Проверить происхождение и актуальность базы"]
+  command_baseline_check -->|on_success| ai_baseline_review
+  ai_baseline_review["ai-baseline-review<br/>Проверить восстановленные знания"]
+  ai_baseline_review -->|on_success| human_baseline_approval
+  ai_baseline_review -->|on_rework| ai_baseline
+  ai_baseline_review -->|on_blocked| terminal_blocked
+  human_baseline_approval["human-baseline-approval<br/>Принять базу с сохранением неизвестного"]
+  human_baseline_approval -->|on_approve| command_baseline_seal
+  human_baseline_approval -->|on_rework| ai_baseline
+  command_baseline_seal["command-baseline-seal<br/>Зафиксировать принятый as-is baseline"]
+  command_baseline_seal -->|on_success| terminal_done
+  terminal_done["terminal-done<br/>База принята с сохранением unknown"]
+  terminal_blocked["terminal-blocked<br/>Остановлено: ошибка, блокер или исчерпанный rework"]

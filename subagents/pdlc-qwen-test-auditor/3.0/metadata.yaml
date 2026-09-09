@@ -1,0 +1,21 @@
+entity_type: subagent
+id: pdlc-qwen-test-auditor
+version: '3.0'
+canonical_name: pdlc-qwen-test-auditor@3.0
+display_name: E2E test auditor
+description: E2E test auditor.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/pdlc-qwen-test-auditor/3.0
+checksum: 41cc755346a8b4bce82956e02cab350b8ad45f76f66925ed51eddbd8e23c54e8
+definition_file: pdlc-qwen-test-auditor.md

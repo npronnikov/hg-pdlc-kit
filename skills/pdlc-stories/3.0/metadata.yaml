@@ -1,0 +1,21 @@
+entity_type: skill
+id: pdlc-stories
+version: '3.0'
+canonical_name: pdlc-stories@3.0
+display_name: Epics, stories и план реализации
+description: Epics, stories и план реализации.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-stories/3.0
+checksum: 96077aed92941e94d4c3dde92eb62fced57231adb5a94310480e21affdd2ae87
+skill_kind: analysis

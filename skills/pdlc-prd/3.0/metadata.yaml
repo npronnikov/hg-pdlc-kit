@@ -1,0 +1,21 @@
+entity_type: skill
+id: pdlc-prd
+version: '3.0'
+canonical_name: pdlc-prd@3.0
+display_name: PRD и бизнес-требования
+description: PRD и бизнес-требования.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-prd/3.0
+checksum: 62d1ff47696b4aeac9a6b2d2d48e62d3be8d404fa057d5bac211c8bd32f37d9f
+skill_kind: analysis

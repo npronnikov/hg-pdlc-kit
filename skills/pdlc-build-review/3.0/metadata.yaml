@@ -1,0 +1,21 @@
+entity_type: skill
+id: pdlc-build-review
+version: '3.0'
+canonical_name: pdlc-build-review@3.0
+display_name: Разбор фактической сборки
+description: Разбор фактической сборки.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-build-review/3.0
+checksum: e1545fa2b1509c09e3d6f3dbecc8d9a3af17dbfe6c3265477137be0aac8cc933
+skill_kind: analysis

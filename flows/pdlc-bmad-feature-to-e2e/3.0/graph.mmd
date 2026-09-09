@@ -1,0 +1,108 @@
+flowchart TD
+  command_prepare["command-prepare<br/>Подготовить project verifier и исходный снимок"]
+  command_prepare -->|on_success| ai_discover
+  ai_discover["ai-discover<br/>Изучить монорепозиторий и подготовить интервью"]
+  ai_discover -->|on_success| human_interview
+  human_interview["human-interview<br/>Интервью владельца продукта"]
+  human_interview -->|on_submit| ai_prd
+  human_interview -->|on_rework| ai_discover
+  ai_prd["ai-prd<br/>PRD, бизнес-правила и критерии приёмки"]
+  ai_prd -->|on_success| command_prd_check
+  ai_prd -->|on_questions| ai_discover
+  ai_prd -->|on_blocked| terminal_blocked
+  command_prd_check["command-prd-check<br/>Проверить PRD-трассировку"]
+  command_prd_check -->|on_success| ai_prd_review
+  ai_prd_review["ai-prd-review<br/>Независимо проверить бизнес-полноту"]
+  ai_prd_review -->|on_success| human_prd_approval
+  ai_prd_review -->|on_rework| ai_prd
+  ai_prd_review -->|on_intent| ai_discover
+  ai_prd_review -->|on_blocked| terminal_blocked
+  human_prd_approval["human-prd-approval<br/>Утвердить намерение и PRD"]
+  human_prd_approval -->|on_approve| command_seal_prd
+  human_prd_approval -->|on_rework| ai_prd
+  command_seal_prd["command-seal-prd<br/>Зафиксировать принятый набор PRD"]
+  command_seal_prd -->|on_success| ai_architecture
+  ai_architecture["ai-architecture<br/>C4, arc42-профиль и ADR"]
+  ai_architecture -->|on_success| ai_srs
+  ai_architecture -->|on_intent| ai_discover
+  ai_architecture -->|on_blocked| terminal_blocked
+  ai_srs["ai-srs<br/>SRS и интерфейсные контракты"]
+  ai_srs -->|on_success| ai_test_model
+  ai_srs -->|on_architecture| ai_architecture
+  ai_srs -->|on_intent| ai_discover
+  ai_srs -->|on_blocked| terminal_blocked
+  ai_test_model["ai-test-model<br/>Модель E2E и конечный план проверок"]
+  ai_test_model -->|on_success| ai_stories
+  ai_test_model -->|on_system| ai_srs
+  ai_test_model -->|on_intent| ai_discover
+  ai_test_model -->|on_blocked| terminal_blocked
+  ai_stories["ai-stories<br/>Epics/stories, зависимости и риск"]
+  ai_stories -->|on_success| command_design_check
+  ai_stories -->|on_system| ai_srs
+  ai_stories -->|on_blocked| terminal_blocked
+  command_design_check["command-design-check<br/>Проверить связность design→тесты→stories"]
+  command_design_check -->|on_success| ai_readiness
+  ai_readiness["ai-readiness<br/>Implementation readiness и карта решения человека"]
+  ai_readiness -->|on_success| command_seal_design_auto
+  ai_readiness -->|on_approval| human_design_approval
+  ai_readiness -->|on_architecture| ai_architecture
+  ai_readiness -->|on_system| ai_srs
+  ai_readiness -->|on_model| ai_test_model
+  ai_readiness -->|on_plan| ai_stories
+  ai_readiness -->|on_intent| ai_discover
+  ai_readiness -->|on_blocked| terminal_blocked
+  human_design_approval["human-design-approval<br/>Техническое решение по дизайну и риску"]
+  human_design_approval -->|on_approve| command_seal_design_human
+  human_design_approval -->|on_rework| ai_architecture
+  command_seal_design_auto["command-seal-design-auto<br/>Применить согласованную low-risk политику"]
+  command_seal_design_auto -->|on_success| ai_implement
+  command_seal_design_human["command-seal-design-human<br/>Зафиксировать техническое согласование"]
+  command_seal_design_human -->|on_success| ai_implement
+  ai_implement["ai-implement<br/>Реализовать stories в монорепозитории"]
+  ai_implement -->|on_success| command_code_check
+  ai_implement -->|on_architecture| ai_architecture
+  ai_implement -->|on_system| ai_srs
+  ai_implement -->|on_intent| ai_discover
+  ai_implement -->|on_blocked| terminal_blocked
+  command_code_check["command-code-check<br/>Проверить stories→реальный код"]
+  command_code_check -->|on_success| command_build
+  command_build["command-build<br/>Выполнить настоящую конечную сборку/проверки"]
+  command_build -->|on_success| ai_build_review
+  ai_build_review["ai-build-review<br/>Разобрать результат сборки и структурной проверки"]
+  ai_build_review -->|on_success| ai_code_review
+  ai_build_review -->|on_rework| ai_implement
+  ai_build_review -->|on_system| ai_srs
+  ai_build_review -->|on_architecture| ai_architecture
+  ai_build_review -->|on_blocked| terminal_blocked
+  ai_code_review["ai-code-review<br/>Три независимых каталожных code reviewer"]
+  ai_code_review -->|on_success| ai_e2e
+  ai_code_review -->|on_code| ai_implement
+  ai_code_review -->|on_system| ai_srs
+  ai_code_review -->|on_architecture| ai_architecture
+  ai_code_review -->|on_intent| ai_discover
+  ai_code_review -->|on_blocked| terminal_blocked
+  ai_e2e["ai-e2e<br/>Написать исполняемые E2E по принятой модели"]
+  ai_e2e -->|on_success| ai_test_review
+  ai_e2e -->|on_model| ai_test_model
+  ai_e2e -->|on_system| ai_srs
+  ai_e2e -->|on_blocked| terminal_blocked
+  ai_test_review["ai-test-review<br/>Проверить E2E oracle и настоящий системный контур"]
+  ai_test_review -->|on_success| command_e2e
+  ai_test_review -->|on_rework| ai_e2e
+  ai_test_review -->|on_model| ai_test_model
+  ai_test_review -->|on_blocked| terminal_blocked
+  command_e2e["command-e2e<br/>Исполнить E2E и сопоставить реальные результаты с ID"]
+  command_e2e -->|on_success| ai_evidence_review
+  ai_evidence_review["ai-evidence-review<br/>Приёмка evidence или трассируемый возврат"]
+  ai_evidence_review -->|on_success| command_finalize
+  ai_evidence_review -->|on_code| ai_implement
+  ai_evidence_review -->|on_test| ai_e2e
+  ai_evidence_review -->|on_model| ai_test_model
+  ai_evidence_review -->|on_system| ai_srs
+  ai_evidence_review -->|on_architecture| ai_architecture
+  ai_evidence_review -->|on_intent| ai_discover
+  ai_evidence_review -->|on_blocked| terminal_blocked
+  command_finalize["command-finalize<br/>Закончить только со свежими полными E2E"]
+  command_finalize -->|on_success| terminal_done
+  terminal_done["terminal-done<br/>Проверено — без интеграции и релиза"]
+  terminal_blocked["terminal-blocked<br/>Остановлено: ошибка, блокер или исчерпанный rework"]

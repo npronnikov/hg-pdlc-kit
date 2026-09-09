@@ -1,0 +1,21 @@
+entity_type: subagent
+id: pdlc-qwen-blind-hunter
+version: '3.0'
+canonical_name: pdlc-qwen-blind-hunter@3.0
+display_name: Blind code hunter
+description: Blind code hunter.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/pdlc-qwen-blind-hunter/3.0
+checksum: b29636a16eb1b248ee3b7bff8ac14afd5202c36ea82c4dd3bbb376c8a7d0cd73
+definition_file: pdlc-qwen-blind-hunter.md

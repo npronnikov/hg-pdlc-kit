@@ -1,0 +1,21 @@
+entity_type: subagent
+id: pdlc-qwen-architecture-auditor
+version: '3.0'
+canonical_name: pdlc-qwen-architecture-auditor@3.0
+display_name: Architecture auditor
+description: Architecture auditor.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/pdlc-qwen-architecture-auditor/3.0
+checksum: 7519089b00ed39e7d29b553e91c0b6d07abd0c30544919194de52c3f72ab689a
+definition_file: pdlc-qwen-architecture-auditor.md

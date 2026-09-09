@@ -1,0 +1,21 @@
+entity_type: skill
+id: pdlc-bootstrap
+version: '3.0'
+canonical_name: pdlc-bootstrap@3.0
+display_name: Восстановление brownfield-базы
+description: Восстановление brownfield-базы.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-bootstrap/3.0
+checksum: 9e6968747250fe653de37e8c8e83b14d1145ea4c060be763f52b3ad2372d61a9
+skill_kind: analysis

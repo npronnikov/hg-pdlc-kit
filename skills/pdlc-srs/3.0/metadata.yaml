@@ -1,0 +1,21 @@
+entity_type: skill
+id: pdlc-srs
+version: '3.0'
+canonical_name: pdlc-srs@3.0
+display_name: Системные требования и контракты
+description: Системные требования и контракты.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-srs/3.0
+checksum: 36489fd3c747518bf6e736e3fe27c87c34e2250b0006c939d5fd265fb14b591e
+skill_kind: analysis

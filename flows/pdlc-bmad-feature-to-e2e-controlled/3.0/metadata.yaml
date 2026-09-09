@@ -1,0 +1,23 @@
+entity_type: flow
+id: pdlc-bmad-feature-to-e2e-controlled
+version: '3.0'
+canonical_name: pdlc-bmad-feature-to-e2e-controlled@3.0
+display_name: 'BMAD monorepo: обязательное техническое согласование'
+description: 'Каталог по контрактам aidlc.zip: Qwen subagent_refs, FTL rework, native run artifacts. Один монорепозиторий.
+  Полезные результаты — project.'
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: flows/pdlc-bmad-feature-to-e2e-controlled/3.0
+checksum: b0f0a6ffbf39fe0ffc617a7aaeceab980fbe2c4cb679257c35e3a46caaf8706e
+flow_kind: delivery
+risk_level: medium

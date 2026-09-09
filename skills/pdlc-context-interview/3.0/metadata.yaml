@@ -1,0 +1,21 @@
+entity_type: skill
+id: pdlc-context-interview
+version: '3.0'
+canonical_name: pdlc-context-interview@3.0
+display_name: Анализ монорепозитория и интервью
+description: Анализ монорепозитория и интервью.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-context-interview/3.0
+checksum: 0dae1c4869db55165549f6da2eb7f44b209e70086160e2b249fafc0965b53f1c
+skill_kind: analysis

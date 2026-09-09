@@ -1,0 +1,21 @@
+entity_type: subagent
+id: pdlc-qwen-edge-case-hunter
+version: '3.0'
+canonical_name: pdlc-qwen-edge-case-hunter@3.0
+display_name: Edge-case hunter
+description: Edge-case hunter.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/pdlc-qwen-edge-case-hunter/3.0
+checksum: 8e61658bb1504854b1099e1c16f1bf62699df177c4e56d3c684410a11590973e
+definition_file: pdlc-qwen-edge-case-hunter.md

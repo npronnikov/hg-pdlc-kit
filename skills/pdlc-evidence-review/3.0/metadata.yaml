@@ -1,0 +1,21 @@
+entity_type: skill
+id: pdlc-evidence-review
+version: '3.0'
+canonical_name: pdlc-evidence-review@3.0
+display_name: Трассируемая приёмка и triage
+description: Трассируемая приёмка и triage.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-evidence-review/3.0
+checksum: 9f27c850f2f2614547784930f88693101dba64e43cd21cd2d150f971283092fb
+skill_kind: analysis

@@ -1,0 +1,23 @@
+entity_type: flow
+id: pdlc-bmad-bootstrap
+version: '3.0'
+canonical_name: pdlc-bmad-bootstrap@3.0
+display_name: 'BMAD monorepo: восстановление проверяемой базы'
+description: 'Каталог по контрактам aidlc.zip: Qwen subagent_refs, FTL rework, native run artifacts. Один монорепозиторий.
+  Полезные результаты — project.'
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: flows/pdlc-bmad-bootstrap/3.0
+checksum: c0ba158aee58a9364f9ddc257a570322029f9b2569be856300da687eab86a41e
+flow_kind: analysis
+risk_level: medium

@@ -1,0 +1,21 @@
+entity_type: skill
+id: pdlc-traceability
+version: '3.0'
+canonical_name: pdlc-traceability@3.0
+display_name: Сквозная трассируемость
+description: Сквозная трассируемость.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-traceability/3.0
+checksum: f2d3437c70040babbd3680b0863219c8d5282dc157d317c261d54acd6045de2d
+skill_kind: analysis

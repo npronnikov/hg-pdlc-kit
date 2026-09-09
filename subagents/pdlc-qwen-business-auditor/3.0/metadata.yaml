@@ -1,0 +1,21 @@
+entity_type: subagent
+id: pdlc-qwen-business-auditor
+version: '3.0'
+canonical_name: pdlc-qwen-business-auditor@3.0
+display_name: Business auditor
+description: Business auditor.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/pdlc-qwen-business-auditor/3.0
+checksum: 143b0bd8afba51857d21fd9b24e636ca18a7b88f0cfbc0a35872757bf1143719
+definition_file: pdlc-qwen-business-auditor.md

@@ -1,0 +1,21 @@
+entity_type: skill
+id: pdlc-implement
+version: '3.0'
+canonical_name: pdlc-implement@3.0
+display_name: Разработка по stories
+description: Разработка по stories.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-implement/3.0
+checksum: 5e785b495508dc960fda48b109ef9b3825ce88632ae8d6dcd9910f45c406e676
+skill_kind: code

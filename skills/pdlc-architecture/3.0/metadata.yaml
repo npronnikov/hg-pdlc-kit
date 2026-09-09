@@ -1,0 +1,21 @@
+entity_type: skill
+id: pdlc-architecture
+version: '3.0'
+canonical_name: pdlc-architecture@3.0
+display_name: Архитектура изменения
+description: Архитектура изменения.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-architecture/3.0
+checksum: 62f75a0ff577b1a782ecaba0b5277850d6f9d1fd0bddd58dcd1a1ce6fec8a705
+skill_kind: analysis

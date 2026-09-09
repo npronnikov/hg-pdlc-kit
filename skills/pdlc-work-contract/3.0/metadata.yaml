@@ -1,0 +1,21 @@
+entity_type: skill
+id: pdlc-work-contract
+version: '3.0'
+canonical_name: pdlc-work-contract@3.0
+display_name: Контракт HG SDLC
+description: Контракт HG SDLC.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-work-contract/3.0
+checksum: 09c1553ddb39daa67933007ada3ab3e847f0139d361eb1b04440261e0de8081b
+skill_kind: analysis

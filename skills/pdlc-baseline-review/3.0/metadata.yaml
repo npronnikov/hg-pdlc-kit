@@ -1,0 +1,21 @@
+entity_type: skill
+id: pdlc-baseline-review
+version: '3.0'
+canonical_name: pdlc-baseline-review@3.0
+display_name: Приёмка восстановленной базы
+description: Приёмка восстановленной базы.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-baseline-review/3.0
+checksum: dfe88504383e6c9fe146d4f342538b116a3f33047923c7351d4a3c683172a4c1
+skill_kind: analysis

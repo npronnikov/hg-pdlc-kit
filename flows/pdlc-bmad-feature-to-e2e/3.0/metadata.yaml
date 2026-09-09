@@ -1,0 +1,23 @@
+entity_type: flow
+id: pdlc-bmad-feature-to-e2e
+version: '3.0'
+canonical_name: pdlc-bmad-feature-to-e2e@3.0
+display_name: 'BMAD monorepo: PRD → architecture → SRS → code → E2E'
+description: 'Каталог по контрактам aidlc.zip: Qwen subagent_refs, FTL rework, native run artifacts. Один монорепозиторий.
+  Полезные результаты — project.'
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: flows/pdlc-bmad-feature-to-e2e/3.0
+checksum: 7265e6242f0ebda97c324370f0f9fb1d55d5d5dd62bd20c8f6ee9490f6494e6f
+flow_kind: delivery
+risk_level: medium

@@ -1,0 +1,21 @@
+entity_type: skill
+id: pdlc-e2e-author
+version: '3.0'
+canonical_name: pdlc-e2e-author@3.0
+display_name: Исполняемые E2E после кода
+description: Исполняемые E2E после кода.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-e2e-author/3.0
+checksum: e7f63bb110a0fba401cb308c89d464368ff46418ddcdae52aace507e6df45241
+skill_kind: qa

@@ -1,0 +1,21 @@
+entity_type: subagent
+id: pdlc-qwen-acceptance-auditor
+version: '3.0'
+canonical_name: pdlc-qwen-acceptance-auditor@3.0
+display_name: Acceptance auditor
+description: Acceptance auditor.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/pdlc-qwen-acceptance-auditor/3.0
+checksum: 48e903d14cc88d91a6b7a441ac849cf3c1a4659db757e030730ba8d13e63e074
+definition_file: pdlc-qwen-acceptance-auditor.md

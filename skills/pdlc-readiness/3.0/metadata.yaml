@@ -1,0 +1,21 @@
+entity_type: skill
+id: pdlc-readiness
+version: '3.0'
+canonical_name: pdlc-readiness@3.0
+display_name: Implementation readiness и техническое решение
+description: Implementation readiness и техническое решение.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: skills/pdlc-readiness/3.0
+checksum: eaea03710e84861a8cda8e184ccad88da50c3fbab2f44a2ca7340c03a622ba92
+skill_kind: analysis

@@ -1,0 +1,21 @@
+entity_type: subagent
+id: pdlc-qwen-system-auditor
+version: '3.0'
+canonical_name: pdlc-qwen-system-auditor@3.0
+display_name: System auditor
+description: System auditor.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- pdlc
+- bmad
+- monorepo
+- traceability
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: main
+source_path: subagents/pdlc-qwen-system-auditor/3.0
+checksum: 780df8539a073611e10266d44762ae3c5dc10cf6c6b8855a8d492b2c65c50c3b
+definition_file: pdlc-qwen-system-auditor.md
