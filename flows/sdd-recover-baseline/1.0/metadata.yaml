@@ -20,6 +20,6 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/flows/sdd-recover-baseline/1.0
-checksum: "14df63b29d883dbfdfd33a27aef8dee0dee704fc172d25f24c0f564f2d95864a"
+checksum: "9048acd59a8e9c3bfb7a048d3d0612b4189530f8f6e85838e239bb0bb34cc2ac"
 flow_kind: delivery
 risk_level: medium
