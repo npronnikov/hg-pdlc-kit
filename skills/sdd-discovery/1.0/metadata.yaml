@@ -1,0 +1,21 @@
+entity_type: skill
+id: sdd-discovery
+version: '1.0'
+canonical_name: sdd-discovery@1.0
+display_name: Анализ репозитория и готовности среды
+description: Заземляет запрос в текущем коде, спецификациях, тестах и реальных возможностях инструментов.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- analysis
+- brownfield
+- tech-stack
+- qwen
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-discovery/1.0
+checksum: "960dc2fdf25e7f72ad5799341aa7cb79ca2b2833266bb925a2b89494413e8d8d"
+skill_kind: analysis

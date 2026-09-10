@@ -1,0 +1,24 @@
+entity_type: flow
+id: sdd-feature-e2e
+version: '1.0'
+canonical_name: sdd-feature-e2e@1.0
+display_name: Полная фича · PRD → архитектура → SRS → код → e2e
+description: Сквозная разработка с интервью ВП, тремя до-кодовыми приёмками, независимым ревью, реальными UI/API/CLI/event
+  e2e и финальным человеческим approve. После него — только фиксация согласованных документов.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- qwen
+- sdd
+- full-cycle
+- implementation
+- verification
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/flows/sdd-feature-e2e/1.0
+checksum: "2819bafcd55eddab1a47e0c14459e0d3c26bfd861931d5a96933fd1f94103007"
+flow_kind: delivery
+risk_level: medium

@@ -1,0 +1,21 @@
+entity_type: skill
+id: sdd-seal-baseline
+version: '1.0'
+canonical_name: sdd-seal-baseline@1.0
+display_name: Фиксация принятой базы в репозитории
+description: После реального approve применяет только подготовленный документационный patch и записывает receipt.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- documentation
+- governance
+- verification
+- sdd
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-seal-baseline/1.0
+checksum: "3213a017d7c05db822c804fdb916fe00b86cfd58ed2d444b8b3396fcfc2dde34"
+skill_kind: analysis

@@ -1,0 +1,21 @@
+entity_type: subagent
+id: sdd-spec-test-auditor
+version: '1.0'
+canonical_name: sdd-spec-test-auditor@1.0
+display_name: Аудитор требований и тестовой модели
+description: Проверяет непротиворечивость BR→SYS→TC, полноту обязательного поведения и качество oracle.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- qwen
+- review
+- acceptance
+- edge-cases
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/subagents/sdd-spec-test-auditor/1.0
+checksum: "6c93458f2d1b4bf5e7ea1cd292c3b273d461b1ca6203a468479a8de1ada510fb"
+definition_file: sdd-spec-test-auditor.md

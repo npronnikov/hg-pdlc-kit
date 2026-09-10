@@ -1,0 +1,26 @@
+entity_type: flow
+id: sdd-bugfix-e2e
+version: '1.0'
+canonical_name: sdd-bugfix-e2e@1.0
+display_name: Исправление дефекта · red reproduction → bounded contract → e2e regression
+description: Узкий bugfix с доказанным исходным сбоем, принятым ожидаемым поведением, анализом architecture/system
+  impact, минимальным fix и настоящей e2e-регрессией. Запрос, меняющий бизнес-политику, возвращается к полному feature
+  flow.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- qwen
+- sdd
+- quick
+- review
+- verification
+- implementation
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/flows/sdd-bugfix-e2e/1.0
+checksum: "8e6d9521ed729616e8e20cddc566d44aae89f5a9eaa770e647a39a9f9b18571a"
+flow_kind: delivery
+risk_level: medium

@@ -1,0 +1,20 @@
+entity_type: subagent
+id: sdd-repository-cartographer
+version: '1.0'
+canonical_name: sdd-repository-cartographer@1.0
+display_name: Картограф репозитория
+description: Независимо проверяет карту существующего продукта, кода, контрактов и тестов.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- qwen
+- review
+- quality
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/subagents/sdd-repository-cartographer/1.0
+checksum: "aeff50c521014d5e93c3f82b41230c8ad2c504e34db73dd78fa76960d5ee5849"
+definition_file: sdd-repository-cartographer.md

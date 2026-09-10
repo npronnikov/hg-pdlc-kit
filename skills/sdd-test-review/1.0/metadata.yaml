@@ -1,0 +1,21 @@
+entity_type: skill
+id: sdd-test-review
+version: '1.0'
+canonical_name: sdd-test-review@1.0
+display_name: Ревью тестов и oracle
+description: Не даёт получить зелёный результат за счёт слабых assertions, пропуска UI или скрытых mocks.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- testing
+- review
+- quality-gate
+- verification
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-test-review/1.0
+checksum: "4fa5f90dd355530c04140f0cea94f55f4b39113a3ad28d5259c3499a8d384b42"
+skill_kind: analysis

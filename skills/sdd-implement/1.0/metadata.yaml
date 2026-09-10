@@ -1,0 +1,22 @@
+entity_type: skill
+id: sdd-implement
+version: '1.0'
+canonical_name: sdd-implement@1.0
+display_name: Реализация Qwen с коротким TDD-циклом
+description: Пишет код в нативном стеке и подтверждает каждый slice unit/integration проверками.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- implementation
+- coding
+- tdd
+- green
+- refactoring
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-implement/1.0
+checksum: "80ed2687c8f3c309bbebb2401114ec66b23b3b651b6ff56f6b647400db0f007a"
+skill_kind: analysis

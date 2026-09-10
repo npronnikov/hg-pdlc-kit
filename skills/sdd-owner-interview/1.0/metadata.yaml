@@ -1,0 +1,21 @@
+entity_type: skill
+id: sdd-owner-interview
+version: '1.0'
+canonical_name: sdd-owner-interview@1.0
+display_name: Интервью владельца продукта
+description: Формирует адресные вопросы, сохраняет ответы и возвращается к неразрешённым критическим пробелам.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- clarification
+- product-owner
+- requirements
+- qwen
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-owner-interview/1.0
+checksum: "bea5037bba26a27581d1cc8b4b08350ccaec69860dd575526d9d16c6f5c28974"
+skill_kind: analysis

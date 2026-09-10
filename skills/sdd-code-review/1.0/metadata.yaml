@@ -1,0 +1,21 @@
+entity_type: skill
+id: sdd-code-review
+version: '1.0'
+canonical_name: sdd-code-review@1.0
+display_name: Независимое ревью реализации
+description: Сверяет diff с требованиями и проверяет correctness, security, данные и влияние на регрессию.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- review
+- quality
+- security
+- verification
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-code-review/1.0
+checksum: "6833e7398290a102d8275b1443a726e2d4fa2f55c6e610851ace251f02484bb3"
+skill_kind: analysis

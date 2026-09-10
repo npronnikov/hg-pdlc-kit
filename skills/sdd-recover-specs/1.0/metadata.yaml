@@ -1,0 +1,21 @@
+entity_type: skill
+id: sdd-recover-specs
+version: '1.0'
+canonical_name: sdd-recover-specs@1.0
+display_name: Восстановление спецификаций as-is
+description: Восстанавливает знания из кода с доказательствами, не превращая случайную реализацию в желаемое поведение.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- reverse-engineering
+- brownfield
+- analysis
+- documentation
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-recover-specs/1.0
+checksum: "c2d01330ca9a9071f552e7bad71cf931ddf6f12088926d178077012be63272ce"
+skill_kind: analysis

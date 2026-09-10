@@ -1,0 +1,21 @@
+entity_type: skill
+id: sdd-blocker-handling
+version: '1.0'
+canonical_name: sdd-blocker-handling@1.0
+display_name: Остановка и решение блокировки человеком
+description: Делает ограничения среды, доступа и scope явными без фиктивного прохода quality gate.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- clarification
+- quality-gate
+- verification
+- governance
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-blocker-handling/1.0
+checksum: "a2b86548bef32e1f7a70aabb9e4ad3e7b7bdc2df17cdeea3fc98a3873fafdbc7"
+skill_kind: analysis

@@ -1,0 +1,21 @@
+entity_type: subagent
+id: sdd-business-auditor
+version: '1.0'
+canonical_name: sdd-business-auditor@1.0
+display_name: Аудитор бизнес-контракта
+description: Ищет пропущенные правила, роли, исключения, неотвеченные вопросы и непроверяемые AC.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- qwen
+- review
+- acceptance
+- edge-cases
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/subagents/sdd-business-auditor/1.0
+checksum: "2750b0797ccd1706f360cb6ccdf3048e9d87c9980290f0429e86a0a7a7988729"
+definition_file: sdd-business-auditor.md

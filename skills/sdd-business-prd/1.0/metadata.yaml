@@ -1,0 +1,21 @@
+entity_type: skill
+id: sdd-business-prd
+version: '1.0'
+canonical_name: sdd-business-prd@1.0
+display_name: Исчерпывающий BRD/PRD
+description: Превращает ответы ВП в проверяемый бизнес-контракт с правилами, scope и acceptance examples.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- requirements
+- user-stories
+- product-owner
+- specification
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-business-prd/1.0
+checksum: "57f5f92955f1f1cb5be0fd02e869ba8af8ae837cc9b4b6d3726bb052b6520b67"
+skill_kind: analysis

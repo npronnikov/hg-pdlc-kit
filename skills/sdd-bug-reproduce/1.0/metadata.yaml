@@ -1,0 +1,21 @@
+entity_type: skill
+id: sdd-bug-reproduce
+version: '1.0'
+canonical_name: sdd-bug-reproduce@1.0
+display_name: 'Дефект: ожидаемое поведение и red-reproducer'
+description: Отделяет баг от новой фичи и получает доказанный сбой до изменения production кода.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- analysis
+- testing
+- red
+- verification
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-bug-reproduce/1.0
+checksum: "b5fea2ef29f699e1bfe7293f6a09c8ef1937b37fed9ccf8e661dda9fc3418f9f"
+skill_kind: analysis

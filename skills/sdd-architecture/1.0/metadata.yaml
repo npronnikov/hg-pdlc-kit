@@ -1,0 +1,22 @@
+entity_type: skill
+id: sdd-architecture
+version: '1.0'
+canonical_name: sdd-architecture@1.0
+display_name: Архитектура C4 + arc42 + ADR
+description: Проектирует решение по принятому PRD, сравнивает варианты и фиксирует архитектурные последствия.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- architecture
+- c4
+- mermaid
+- design
+- nfr
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-architecture/1.0
+checksum: "71003b258a226b08d5eba14e4bcbc01c4b97918d4e9e8d668b26d3294506e8e0"
+skill_kind: analysis

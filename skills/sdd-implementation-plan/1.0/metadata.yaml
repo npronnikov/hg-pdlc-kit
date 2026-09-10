@@ -1,0 +1,21 @@
+entity_type: skill
+id: sdd-implementation-plan
+version: '1.0'
+canonical_name: sdd-implementation-plan@1.0
+display_name: План реализации по принятому пакету
+description: Делит требования на вертикальные проверяемые шаги с файлами, тестами и зависимостями.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- planning
+- tasks
+- decomposition
+- implementation
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-implementation-plan/1.0
+checksum: "d5c80626553840290927d21b86c8aebdc7288181b11300fba8d9497c32f1d4aa"
+skill_kind: analysis

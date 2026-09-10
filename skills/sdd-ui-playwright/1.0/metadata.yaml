@@ -1,0 +1,21 @@
+entity_type: skill
+id: sdd-ui-playwright
+version: '1.0'
+canonical_name: sdd-ui-playwright@1.0
+display_name: 'UI e2e: браузер, семантика и устойчивость'
+description: Обучает UI-автора исследовать интерфейс и писать надёжные browser tests в реальной среде.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- testing
+- verification
+- quality
+- implementation
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-ui-playwright/1.0
+checksum: "36d53dcfafe85bb23f1f8723f0e5a501d5849482170ae7d127b23ceaf93ceba0"
+skill_kind: analysis

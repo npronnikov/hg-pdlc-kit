@@ -1,0 +1,21 @@
+entity_type: skill
+id: sdd-readiness-review
+version: '1.0'
+canonical_name: sdd-readiness-review@1.0
+display_name: Проверка связности до кода
+description: Проверяет PRD, архитектуру, SRS, контракты и тестовую модель как единый пакет.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- review
+- consistency
+- checklist
+- quality-gate
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-readiness-review/1.0
+checksum: "c20a90315ea3a862381247e714a1c2346a50912357c615145c4cf655bf7dfbd6"
+skill_kind: analysis

@@ -1,0 +1,21 @@
+entity_type: subagent
+id: sdd-ui-test-auditor
+version: '1.0'
+canonical_name: sdd-ui-test-auditor@1.0
+display_name: Аудитор интерфейсных e2e
+description: 'Ищет ложнозелёные browser тесты: mocks основного пути, слабые assertions, неверные selectors и fixtures.'
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- qwen
+- review
+- acceptance
+- edge-cases
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/subagents/sdd-ui-test-auditor/1.0
+checksum: "292752275c1dcd5be00c7dc70ecf8e3f3ea60be7edf2a120f5e239ffbfa5e475"
+definition_file: sdd-ui-test-auditor.md

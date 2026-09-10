@@ -1,0 +1,21 @@
+entity_type: skill
+id: sdd-acceptance-pack
+version: '1.0'
+canonical_name: sdd-acceptance-pack@1.0
+display_name: Пакет финальной приёмки
+description: 'Собирает проверяемый результат для ВП: scope, работающий outcome, покрытие и свежие доказательства.'
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- verification
+- quality-gate
+- documentation
+- review
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-acceptance-pack/1.0
+checksum: "ef6aa909ba5de9d3cde67cffd7ed80d53c97811b53c786bcb0b1ff4dd8264164"
+skill_kind: analysis

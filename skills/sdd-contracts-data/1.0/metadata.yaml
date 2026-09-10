@@ -1,0 +1,21 @@
+entity_type: skill
+id: sdd-contracts-data
+version: '1.0'
+canonical_name: sdd-contracts-data@1.0
+display_name: Контракты интерфейсов и данных
+description: Поддерживает SRS конкретными API/event/UI/data контрактами в нативных форматах проекта.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- specification
+- design
+- security
+- documentation
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-contracts-data/1.0
+checksum: "30b48fa827e17306f1a094426190e400f7607b9c29df68c055b4aee5d6558548"
+skill_kind: analysis

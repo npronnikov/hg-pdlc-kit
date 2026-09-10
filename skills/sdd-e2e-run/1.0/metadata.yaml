@@ -1,0 +1,22 @@
+entity_type: skill
+id: sdd-e2e-run
+version: '1.0'
+canonical_name: sdd-e2e-run@1.0
+display_name: Исполнение e2e и сбор evidence
+description: Запускает реальные команды, сопоставляет native reports с моделью и отделяет blocked/fail/flaky от
+  pass.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- testing
+- execution
+- verification
+- quality-gate
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-e2e-run/1.0
+checksum: "63ccc892a9f225d95c7e4e152327d624992df46a1fbf9097aa594aae22c52b0b"
+skill_kind: analysis

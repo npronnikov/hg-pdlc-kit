@@ -1,0 +1,21 @@
+entity_type: skill
+id: sdd-system-srs
+version: '1.0'
+canonical_name: sdd-system-srs@1.0
+display_name: Системные требования в SRS
+description: Формализует принятое бизнес-поведение и архитектуру в атомарные, трассируемые и верифицируемые требования.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- requirements
+- specification
+- nfr
+- security
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-system-srs/1.0
+checksum: "80623e7a32a8f63151d217b1702497fb7d1e4a4e4bcb5890c818491b02b823b7"
+skill_kind: analysis

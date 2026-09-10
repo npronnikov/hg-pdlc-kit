@@ -1,0 +1,21 @@
+entity_type: subagent
+id: sdd-code-auditor
+version: '1.0'
+canonical_name: sdd-code-auditor@1.0
+display_name: Аудитор кода
+description: Независимо ищет ошибки корректности, security и scope drift в фактическом diff.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- qwen
+- review
+- quality
+- adversarial
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/subagents/sdd-code-auditor/1.0
+checksum: "1a3cdebbd849bea391866bb8ff40007d69b1bb9211416e3b0a07cbc4d91a609d"
+definition_file: sdd-code-auditor.md

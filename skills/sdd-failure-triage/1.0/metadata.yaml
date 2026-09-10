@@ -1,0 +1,21 @@
+entity_type: skill
+id: sdd-failure-triage
+version: '1.0'
+canonical_name: sdd-failure-triage@1.0
+display_name: Классификация обратной связи и сбоев
+description: Разделяет дефект продукта, теста, требований и среды и выбирает минимальную корректную фазу возврата.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- analysis
+- review
+- verification
+- quality
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/skills/sdd-failure-triage/1.0
+checksum: "5ae042bc3536d709eb8e71635ddcec31b5674595a88de967e8e50e87746ca7d4"
+skill_kind: analysis

@@ -1,0 +1,21 @@
+entity_type: subagent
+id: sdd-evidence-auditor
+version: '1.0'
+canonical_name: sdd-evidence-auditor@1.0
+display_name: Аудитор доказательств
+description: Сверяет native reports, revision hashes и принятый scope перед финальным человеческим решением.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- qwen
+- review
+- acceptance
+- adversarial
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/subagents/sdd-evidence-auditor/1.0
+checksum: "2451d802d0f351eaa2a69026f93fe2f7e186da976154a0d3469ad7cac476af74"
+definition_file: sdd-evidence-auditor.md

@@ -1,0 +1,25 @@
+entity_type: flow
+id: sdd-recover-baseline
+version: '1.0'
+canonical_name: sdd-recover-baseline@1.0
+display_name: Восстановление baseline · код → продуктовые и системные спецификации
+description: Brownfield-анализ с интервью, разделением фактов/гипотез/неизвестного, C4, SRS и инвентаризацией тестов.
+  Создаёт принятую документационную базу без изменения кода и без фиктивного e2e-pass.
+coding_agent: qwen
+team_code: AIDLC
+platform_code: BACK
+tags:
+- qwen
+- sdd
+- brownfield
+- reverse-engineering
+- documentation
+- architecture
+scope: organization
+approval_status: draft
+lifecycle_status: active
+source_ref: master
+source_path: docs/aidlc-3/flows/sdd-recover-baseline/1.0
+checksum: "2e3aef9613c2cf027db8dc69e04fea8f55f75ef1e7e5ae5c566b9d9c6889d360"
+flow_kind: delivery
+risk_level: medium
