@@ -17,5 +17,5 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/subagents/sdd-code-auditor/1.0
-checksum: "1a3cdebbd849bea391866bb8ff40007d69b1bb9211416e3b0a07cbc4d91a609d"
+checksum: "866d61b5bd3bf8f99f7e52c20179a788335daf2205c53df70d8a3505200aaf16"
 definition_file: sdd-code-auditor.md

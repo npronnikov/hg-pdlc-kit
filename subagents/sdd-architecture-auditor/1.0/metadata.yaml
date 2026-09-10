@@ -17,5 +17,5 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/subagents/sdd-architecture-auditor/1.0
-checksum: "8bbf47582cbf408daae48fc325e74b512c9266b101b888fd401b394b87c7c38c"
+checksum: "d97dc00b2c96bd4ba3c710d6dc336fe1d7f02a048cac64640076ffe429d33b5c"
 definition_file: sdd-architecture-auditor.md

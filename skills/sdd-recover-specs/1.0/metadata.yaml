@@ -17,5 +17,5 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/skills/sdd-recover-specs/1.0
-checksum: "c2d01330ca9a9071f552e7bad71cf931ddf6f12088926d178077012be63272ce"
+checksum: "e921d0738cf9e290954531d96d0cb032b08b5cac42dcebfe2a548a1921c2b091"
 skill_kind: analysis

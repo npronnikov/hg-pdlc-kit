@@ -21,6 +21,6 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/flows/sdd-bugfix-e2e/1.0
-checksum: "8e6d9521ed729616e8e20cddc566d44aae89f5a9eaa770e647a39a9f9b18571a"
+checksum: "a55e283f5eceea3b6cfd843e28c1116a58a9b52806a31a415579c6297e67fa3d"
 flow_kind: delivery
 risk_level: medium

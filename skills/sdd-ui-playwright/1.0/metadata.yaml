@@ -17,5 +17,5 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/skills/sdd-ui-playwright/1.0
-checksum: "36d53dcfafe85bb23f1f8723f0e5a501d5849482170ae7d127b23ceaf93ceba0"
+checksum: "ed28fe985e62d8bbb3e4610a5e64e6f7545fa0d591dba3f669f0a3474dae2f8e"
 skill_kind: analysis

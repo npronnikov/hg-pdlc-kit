@@ -17,5 +17,5 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/skills/sdd-e2e-author/1.0
-checksum: "ae55e51079f8b774bb894f96185c5b03e36b411e868291fa7969b2f034bfe0f5"
+checksum: "920662e679ad053d2a6e58ca94ec2f437af7ee6ce7b09ca00999ef6e93abc9da"
 skill_kind: analysis

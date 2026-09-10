@@ -17,5 +17,5 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/skills/sdd-failure-triage/1.0
-checksum: "5ae042bc3536d709eb8e71635ddcec31b5674595a88de967e8e50e87746ca7d4"
+checksum: "9ec24a3df179ff77c2c85369f5886a54ca308ea5e29dd3f6ab8f26323b3a0ddf"
 skill_kind: analysis

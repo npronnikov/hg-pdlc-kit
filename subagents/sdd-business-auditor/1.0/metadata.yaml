@@ -17,5 +17,5 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/subagents/sdd-business-auditor/1.0
-checksum: "2750b0797ccd1706f360cb6ccdf3048e9d87c9980290f0429e86a0a7a7988729"
+checksum: "4c2a9b5b9ae711cd5461b960127560ab85f9ae8cadfb590559349d2b32a820b4"
 definition_file: sdd-business-auditor.md

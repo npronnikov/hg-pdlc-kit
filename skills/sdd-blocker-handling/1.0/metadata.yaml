@@ -17,5 +17,5 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/skills/sdd-blocker-handling/1.0
-checksum: "a2b86548bef32e1f7a70aabb9e4ad3e7b7bdc2df17cdeea3fc98a3873fafdbc7"
+checksum: "ad9bed4e5183e5a0e238d6397c3b10f976f2630e3271da04c8b2d42a283a8fbf"
 skill_kind: analysis

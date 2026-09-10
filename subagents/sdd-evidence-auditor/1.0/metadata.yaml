@@ -17,5 +17,5 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/subagents/sdd-evidence-auditor/1.0
-checksum: "2451d802d0f351eaa2a69026f93fe2f7e186da976154a0d3469ad7cac476af74"
+checksum: "4478ef5e207bc669affebbdde0fc4ebe450283b6ef7ccd0d43f89facd72035b0"
 definition_file: sdd-evidence-auditor.md

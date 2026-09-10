@@ -17,5 +17,5 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/skills/sdd-contracts-data/1.0
-checksum: "30b48fa827e17306f1a094426190e400f7607b9c29df68c055b4aee5d6558548"
+checksum: "5c48cb9fdbb63a747eae13a7ac55210c6b588b29dc4595bc0e479d9ed49a9cb0"
 skill_kind: analysis

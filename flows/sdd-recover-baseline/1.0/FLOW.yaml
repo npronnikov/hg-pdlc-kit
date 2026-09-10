@@ -2,13 +2,12 @@ id: sdd-recover-baseline
 version: '1.0'
 canonical_name: sdd-recover-baseline@1.0
 title: Восстановление baseline · код → продуктовые и системные спецификации
-description: |-
-  Brownfield-анализ с интервью, разделением фактов/гипотез/неизвестного, C4, SRS и инвентаризацией тестов. Создаёт принятую документационную базу без изменения кода и без фиктивного e2e-pass.
+description: Brownfield-анализ с интервью, разделением фактов/гипотез/неизвестного, C4, SRS и инвентаризацией тестов.
+  Создаёт принятую документационную базу без изменения кода и без фиктивного e2e-pass.
 coding_agent: qwen
 start_node_id: r01-discover
 failure_node_id: sdd-recover-baseline-done
 fail_on_missing_declared_output: true
-fail_on_missing_expected_mutation: false
 nodes:
 - id: r01-discover
   title: 01 · Карта продукта и вопросы о текущем поведении
@@ -32,34 +31,21 @@ nodes:
     Замечания r12-unblock: ${feedback1.rework_instruction}
     </#if>
 
+    Предусловия приёмки:человеческий approve на входе этой стадии не требуется; не подделывать его.
 
-    Обязательно выполни sdd-workspace-contract, затем профильные skills в перечисленном порядке.
-    Определите bounded scope восстановления существующего продукта, docs/code/test evidence и конфликты. До домысливания целей/правил спросите ВП. При повторном входе сохраните уже полученные ответы из текущего change. Никаких source/test изменений.
+    Определите bounded scope восстановления существующего продукта, docs/code/test evidence и конфликты. До домысливания целей/правил спросите ВП. При повторном входе сохраните уже полученные ответы из текущего change. Никаких source/test изменений. Нативные контракты здесь не копируйте: указывайте точные существующие пути/hashes в recovery evidence; выпуск candidate-контрактов выполняет только r07-system-inventory.
 
-    Предусловия приёмки: человеческий approve на входе этой стадии не требуется; не подделывать его.
-    Переданные RUN inputs прочитай по runtime-resolved адресам. Дополнительные файлы открывай по конкретным путям из индексов и проверяй hash.
-    Обязательные выходы RUN:
-    - 00-context/index.md
-    - 00-context/manifest.json
-    - 00-context/handoff.json
-    - 00-context/context.json
-    - 00-context/repository-map.md
-    - 00-context/interview.md
-    - 00-context/interview-state.json
-    - 00-context/recovery-evidence.json
-    Содержимое этих документов и безопасные summaries зеркалируй в CHANGE_ROOT/00-context/. Создай также актуальный CHANGE_ROOT/control/state.json (mode, stage, attempt, source/registry hashes, approvals validity, unresolved), не подменяя runtime audit. Это не flow YAML config.
-    Перед завершением проверь существование, синтаксис, непустое смысловое содержание и соответствие точному текущему run.id всех обязательных выходов; на blocked route документы явно маркируются blocked с причинами.
-    Список actual code/test mutations запиши в manifest; ни при каких обстоятельствах не выдавай документацию за написанный код или исполненный тест.
+    Контракты файлов: выполни sdd-workspace-contract, затем профильные skill_refs по порядку. В блоках OUTPUT_CONTRACTS подключённых SKILL.md выбери только строки, где nodes содержит текущий id; там даны ВСЕ RUN имена, полные PROJECT пути, required/condition и template_id. Создай каждый declared produced_artifact строго по указанному inline-шаблону (JSON — по приложенной схеме). Списки файлов в FLOW instruction не дублируются.
+    RUN пути разрешает runtime; в PROJECT замени только change-root * на текущий run.id, остальные safe IDs бери из реального registry. Индексы ведут к файлам, не заменяют чтение. Required документы заполняются и на blocked-route с причинами, без придуманных фактов; optional создаются только по declared condition. Native evidence и seal backups не копируй в Git.
+    Перед завершением проверь точные пути, шаблоны/синтаксис, текущую ревизию, links/hashes и gate validity. Порядок: содержимое → index/handoff → manifest → control/state → runtime step-summary. Дополнительные файлы/код — только по динамическому файловому контракту профильного skill.
 
-    Субагенты: sdd-repository-cartographer.
-    При наличии списка каждый должен быть реально вызван Qwen Task/task; положи его findings в текущие выходы. Отсутствие делегирования — BLOCKED, не inline-имитация.
+    Субагенты (реальный Qwen Task/task): sdd-repository-cartographer.
+    Основной агент ОБЯЗАН дождаться завершения каждого вызванного сабагента и получить его итоговый ответ ДО записи финальных review/manifest/handoff и step-summary.json, выбора успешного route и завершения ноды. При асинхронном ответе дождись terminal результата через доступный механизм Task; не придумывай имя инструмента ожидания. Пока хотя бы один Task выполняется, дальше не переходи. Ошибка, timeout или недоступный Task — BLOCKED / runtime failure, не подмена inline-ревью. Сохрани полный ответ в назначенном review/index/acceptance, а task_id/статус ожидания/hashes — в manifest.invoked_subagents. Сабагенты только читают; проверь неизменность diff.
 
     Выбор route в runtime step-summary.json:
     - on_success: карта и вопросы готовы; next=r02-interview.
     - on_bad_intent: workspace/tool/baseline blocker; next=r11-blocker.
-    При направлении в blocker-ноду сначала запиши CHANGE_ROOT/control/blocker.json с observed reason, evidence, required action и phase. Если ситуация не укладывается в объявленные маршруты и обязательные outputs создать невозможно, сообщи runtime failure; implicit failure_node_id сохранит ошибку.
-
-    Нормативные contract files размещай в 00-context/contracts/<safe-interface-id>/contract.yaml|contract.json|contract.proto|contract.sql; перечисли каждый реально созданный файл в обязательном contracts.json и manifest. Сохрани исходный формат; выбирай только применимые файлы, не генерируй фиктивный contract ради декларации.
+    При маршруте в blocker создай control/blocker.json по полному PROJECT пути и шаблону из sdd-workspace-contract. Если обязательные выходы безопасно записать невозможно — runtime failure через failure_node_id, не фиктивный success.
   skill_refs:
   - sdd-workspace-contract@1.0
   - sdd-discovery@1.0
@@ -140,39 +126,6 @@ nodes:
     path: docs/sdd/changes/*/control/blocker.json
     required: false
     modifiable: false
-  - scope: run
-    path: 00-context/contracts/*/contract.yaml
-    required: false
-    modifiable: false
-  - scope: project
-    path: docs/sdd/changes/*/00-context/contracts/*/contract.yaml
-    required: false
-    modifiable: false
-  - scope: run
-    path: 00-context/contracts/*/contract.json
-    required: false
-    modifiable: false
-  - scope: project
-    path: docs/sdd/changes/*/00-context/contracts/*/contract.json
-    required: false
-    modifiable: false
-  - scope: run
-    path: 00-context/contracts/*/contract.proto
-    required: false
-    modifiable: false
-  - scope: project
-    path: docs/sdd/changes/*/00-context/contracts/*/contract.proto
-    required: false
-    modifiable: false
-  - scope: run
-    path: 00-context/contracts/*/contract.sql
-    required: false
-    modifiable: false
-  - scope: project
-    path: docs/sdd/changes/*/00-context/contracts/*/contract.sql
-    required: false
-    modifiable: false
-  expected_mutations: []
   on_success:
     transition: r02-interview
   on_bad_intent:
@@ -191,11 +144,11 @@ nodes:
   instruction: |-
     Подтвердите пользователей, бизнес-смысл, ожидаемые правила и известные проблемы текущей системы. Отделите «так сейчас работает» от «так должно работать». Допустимо указать unknown; новые пожелания выделяйте отдельно, они не реализуются этим flow.
     Не вставляйте пароли, токены или cookies. Submit отправляет ответы, но не утверждает требования. Отмена запуска доступна штатным Cancel.
+    Форма и структура этого RUN файла заданы шаблоном interview в sdd-owner-interview@1.0 у AI-предшественника. Сохраните разделы и Q-ID; изменяйте только ответы/явные уточнения. Skill_refs к human_input не добавляются.
   produced_artifacts:
   - scope: run
     path: 00-context/interview.md
     required: true
-  expected_mutations: []
   on_submit:
     transition: r03-business
   on_rework:
@@ -236,35 +189,22 @@ nodes:
     Замечания r09-baseline-approval: ${feedback1.rework_instruction}
     </#if>
 
+    Предусловия приёмки:человеческий approve на входе этой стадии не требуется; не подделывать его.
 
-    Обязательно выполни sdd-workspace-contract, затем профильные skills в перечисленном порядке.
-    Сохраните фактические human answers. Восстановите бизнес-картину/BR/RULE/AC с provenance каждой claim, desired-vs-observed отличием и conflict/unknown register. PRD здесь baseline profile, не предложение новой фичи. Неизвестные исторические цели/NFR не выдумывать.
+    Сохраните фактические human answers. Восстановите бизнес-картину/BR/RULE/AC с provenance каждой claim, desired-vs-observed отличием и conflict/unknown register. PRD здесь baseline profile, не предложение новой фичи. Неизвестные исторические цели/NFR не выдумывать. Нативные контракты здесь не копируйте: указывайте точные существующие пути/hashes в recovery evidence; выпуск candidate-контрактов выполняет только r07-system-inventory.
 
-    Предусловия приёмки: человеческий approve на входе этой стадии не требуется; не подделывать его.
-    Переданные RUN inputs прочитай по runtime-resolved адресам. Дополнительные файлы открывай по конкретным путям из индексов и проверяй hash.
-    Обязательные выходы RUN:
-    - 10-business/index.md
-    - 10-business/manifest.json
-    - 10-business/handoff.json
-    - 10-business/prd.md
-    - 10-business/business-requirements.json
-    - 10-business/answers-record.md
-    - 10-business/recovery-evidence.json
-    - 10-business/business-review.md
-    Содержимое этих документов и безопасные summaries зеркалируй в CHANGE_ROOT/10-business/. Создай также актуальный CHANGE_ROOT/control/state.json (mode, stage, attempt, source/registry hashes, approvals validity, unresolved), не подменяя runtime audit. Это не flow YAML config.
-    Перед завершением проверь существование, синтаксис, непустое смысловое содержание и соответствие точному текущему run.id всех обязательных выходов; на blocked route документы явно маркируются blocked с причинами.
-    Список actual code/test mutations запиши в manifest; ни при каких обстоятельствах не выдавай документацию за написанный код или исполненный тест.
+    Контракты файлов: выполни sdd-workspace-contract, затем профильные skill_refs по порядку. В блоках OUTPUT_CONTRACTS подключённых SKILL.md выбери только строки, где nodes содержит текущий id; там даны ВСЕ RUN имена, полные PROJECT пути, required/condition и template_id. Создай каждый declared produced_artifact строго по указанному inline-шаблону (JSON — по приложенной схеме). Списки файлов в FLOW instruction не дублируются.
+    RUN пути разрешает runtime; в PROJECT замени только change-root * на текущий run.id, остальные safe IDs бери из реального registry. Индексы ведут к файлам, не заменяют чтение. Required документы заполняются и на blocked-route с причинами, без придуманных фактов; optional создаются только по declared condition. Native evidence и seal backups не копируй в Git.
+    Перед завершением проверь точные пути, шаблоны/синтаксис, текущую ревизию, links/hashes и gate validity. Порядок: содержимое → index/handoff → manifest → control/state → runtime step-summary. Дополнительные файлы/код — только по динамическому файловому контракту профильного skill.
 
-    Субагенты: sdd-business-auditor.
-    При наличии списка каждый должен быть реально вызван Qwen Task/task; положи его findings в текущие выходы. Отсутствие делегирования — BLOCKED, не inline-имитация.
+    Субагенты (реальный Qwen Task/task): sdd-business-auditor.
+    Основной агент ОБЯЗАН дождаться завершения каждого вызванного сабагента и получить его итоговый ответ ДО записи финальных review/manifest/handoff и step-summary.json, выбора успешного route и завершения ноды. При асинхронном ответе дождись terminal результата через доступный механизм Task; не придумывай имя инструмента ожидания. Пока хотя бы один Task выполняется, дальше не переходи. Ошибка, timeout или недоступный Task — BLOCKED / runtime failure, не подмена inline-ревью. Сохрани полный ответ в назначенном review/index/acceptance, а task_id/статус ожидания/hashes — в manifest.invoked_subagents. Сабагенты только читают; проверь неизменность diff.
 
     Выбор route в runtime step-summary.json:
     - on_success: картина знаний и пробелов готова; next=r04-business-approval.
     - on_rework: нужны дополнительные ответы/исследование; next=r01-discover.
     - on_bad_intent: scope или evidence blocker; next=r11-blocker.
-    При направлении в blocker-ноду сначала запиши CHANGE_ROOT/control/blocker.json с observed reason, evidence, required action и phase. Если ситуация не укладывается в объявленные маршруты и обязательные outputs создать невозможно, сообщи runtime failure; implicit failure_node_id сохранит ошибку.
-
-    Нормативные contract files размещай в 10-business/contracts/<safe-interface-id>/contract.yaml|contract.json|contract.proto|contract.sql; перечисли каждый реально созданный файл в обязательном contracts.json и manifest. Сохрани исходный формат; выбирай только применимые файлы, не генерируй фиктивный contract ради декларации.
+    При маршруте в blocker создай control/blocker.json по полному PROJECT пути и шаблону из sdd-workspace-contract. Если обязательные выходы безопасно записать невозможно — runtime failure через failure_node_id, не фиктивный success.
   skill_refs:
   - sdd-workspace-contract@1.0
   - sdd-recover-specs@1.0
@@ -344,39 +284,6 @@ nodes:
     path: docs/sdd/changes/*/control/blocker.json
     required: false
     modifiable: false
-  - scope: run
-    path: 10-business/contracts/*/contract.yaml
-    required: false
-    modifiable: false
-  - scope: project
-    path: docs/sdd/changes/*/10-business/contracts/*/contract.yaml
-    required: false
-    modifiable: false
-  - scope: run
-    path: 10-business/contracts/*/contract.json
-    required: false
-    modifiable: false
-  - scope: project
-    path: docs/sdd/changes/*/10-business/contracts/*/contract.json
-    required: false
-    modifiable: false
-  - scope: run
-    path: 10-business/contracts/*/contract.proto
-    required: false
-    modifiable: false
-  - scope: project
-    path: docs/sdd/changes/*/10-business/contracts/*/contract.proto
-    required: false
-    modifiable: false
-  - scope: run
-    path: 10-business/contracts/*/contract.sql
-    required: false
-    modifiable: false
-  - scope: project
-    path: docs/sdd/changes/*/10-business/contracts/*/contract.sql
-    required: false
-    modifiable: false
-  expected_mutations: []
   on_success:
     transition: r04-business-approval
   on_rework:
@@ -415,7 +322,6 @@ nodes:
     Примите достоверность бизнес-картины, различие observed/desired и список неизвестного. Не утверждайте inferred claim как факт без подтверждения. Это не признание текущего продукта бездефектным.
     Approve относится только к показанной версии/manifest hash, а не к будущим изменениям. При замечаниях выберите Rework и укажите конкретные ID/критерии; при прекращении работы — Cancel run. Не разрешайте считать невыполненные/красные обязательные тесты успешными.
   produced_artifacts: []
-  expected_mutations: []
   on_approve:
     transition: r05-architecture
   on_rework:
@@ -456,37 +362,23 @@ nodes:
     decision=${gate0.decision!"missing"}; route=${gate0.route!"missing"}; attempt=${gate0.attempt!0};
     comment=${gate0.comment!""}
 
-    Обязательно выполни sdd-workspace-contract, затем профильные skills в перечисленном порядке.
-    Восстановите actual containers, interfaces, data ownership и runtime сценарии по code evidence. Решения без исторического ADR называйте reconstructed hypotheses. Не проводите редизайн системы. Подтвердите traces file:line и current revision.
+    Предусловия приёмки:действующие approve/route/hashes для r04-business-approval.
 
-    Предусловия приёмки: действующие approve/route/hashes для r04-business-approval.
-    Переданные RUN inputs прочитай по runtime-resolved адресам. Дополнительные файлы открывай по конкретным путям из индексов и проверяй hash.
-    Обязательные выходы RUN:
-    - 20-architecture/index.md
-    - 20-architecture/manifest.json
-    - 20-architecture/handoff.json
-    - 20-architecture/architecture.md
-    - 20-architecture/c4-context.mmd
-    - 20-architecture/c4-containers.mmd
-    - 20-architecture/runtime.mmd
-    - 20-architecture/decisions.md
-    - 20-architecture/recovery-evidence.json
-    - 20-architecture/architecture-review.md
-    Содержимое этих документов и безопасные summaries зеркалируй в CHANGE_ROOT/20-architecture/. Создай также актуальный CHANGE_ROOT/control/state.json (mode, stage, attempt, source/registry hashes, approvals validity, unresolved), не подменяя runtime audit. Это не flow YAML config.
-    Перед завершением проверь существование, синтаксис, непустое смысловое содержание и соответствие точному текущему run.id всех обязательных выходов; на blocked route документы явно маркируются blocked с причинами.
-    Список actual code/test mutations запиши в manifest; ни при каких обстоятельствах не выдавай документацию за написанный код или исполненный тест.
+    Восстановите actual containers, interfaces, data ownership и runtime сценарии по code evidence. Решения без исторического ADR называйте reconstructed hypotheses. Не проводите редизайн системы. Подтвердите traces file:line и current revision. Нативные контракты здесь не копируйте: указывайте точные существующие пути/hashes в recovery evidence; выпуск candidate-контрактов выполняет только r07-system-inventory.
 
-    Субагенты: sdd-repository-cartographer, sdd-architecture-auditor.
-    При наличии списка каждый должен быть реально вызван Qwen Task/task; положи его findings в текущие выходы. Отсутствие делегирования — BLOCKED, не inline-имитация.
+    Контракты файлов: выполни sdd-workspace-contract, затем профильные skill_refs по порядку. В блоках OUTPUT_CONTRACTS подключённых SKILL.md выбери только строки, где nodes содержит текущий id; там даны ВСЕ RUN имена, полные PROJECT пути, required/condition и template_id. Создай каждый declared produced_artifact строго по указанному inline-шаблону (JSON — по приложенной схеме). Списки файлов в FLOW instruction не дублируются.
+    RUN пути разрешает runtime; в PROJECT замени только change-root * на текущий run.id, остальные safe IDs бери из реального registry. Индексы ведут к файлам, не заменяют чтение. Required документы заполняются и на blocked-route с причинами, без придуманных фактов; optional создаются только по declared condition. Native evidence и seal backups не копируй в Git.
+    Перед завершением проверь точные пути, шаблоны/синтаксис, текущую ревизию, links/hashes и gate validity. Порядок: содержимое → index/handoff → manifest → control/state → runtime step-summary. Дополнительные файлы/код — только по динамическому файловому контракту профильного skill.
+
+    Субагенты (реальный Qwen Task/task): sdd-repository-cartographer, sdd-architecture-auditor.
+    Основной агент ОБЯЗАН дождаться завершения каждого вызванного сабагента и получить его итоговый ответ ДО записи финальных review/manifest/handoff и step-summary.json, выбора успешного route и завершения ноды. При асинхронном ответе дождись terminal результата через доступный механизм Task; не придумывай имя инструмента ожидания. Пока хотя бы один Task выполняется, дальше не переходи. Ошибка, timeout или недоступный Task — BLOCKED / runtime failure, не подмена inline-ревью. Сохрани полный ответ в назначенном review/index/acceptance, а task_id/статус ожидания/hashes — в manifest.invoked_subagents. Сабагенты только читают; проверь неизменность diff.
 
     Выбор route в runtime step-summary.json:
     - on_success: архитектурная карта готова; next=r06-architecture-approval.
     - on_rework: дополнить/исправить evidence; next=r05-architecture.
     - on_bad_spec: обнаружен конфликт бизнес-картины; next=r03-business.
     - on_bad_intent: источники или инструменты недоступны; next=r11-blocker.
-    При направлении в blocker-ноду сначала запиши CHANGE_ROOT/control/blocker.json с observed reason, evidence, required action и phase. Если ситуация не укладывается в объявленные маршруты и обязательные outputs создать невозможно, сообщи runtime failure; implicit failure_node_id сохранит ошибку.
-
-    Нормативные contract files размещай в 20-architecture/contracts/<safe-interface-id>/contract.yaml|contract.json|contract.proto|contract.sql; перечисли каждый реально созданный файл в обязательном contracts.json и manifest. Сохрани исходный формат; выбирай только применимые файлы, не генерируй фиктивный contract ради декларации.
+    При маршруте в blocker создай control/blocker.json по полному PROJECT пути и шаблону из sdd-workspace-contract. Если обязательные выходы безопасно записать невозможно — runtime failure через failure_node_id, не фиктивный success.
   skill_refs:
   - sdd-workspace-contract@1.0
   - sdd-recover-specs@1.0
@@ -583,39 +475,6 @@ nodes:
     path: docs/sdd/changes/*/control/blocker.json
     required: false
     modifiable: false
-  - scope: run
-    path: 20-architecture/contracts/*/contract.yaml
-    required: false
-    modifiable: false
-  - scope: project
-    path: docs/sdd/changes/*/20-architecture/contracts/*/contract.yaml
-    required: false
-    modifiable: false
-  - scope: run
-    path: 20-architecture/contracts/*/contract.json
-    required: false
-    modifiable: false
-  - scope: project
-    path: docs/sdd/changes/*/20-architecture/contracts/*/contract.json
-    required: false
-    modifiable: false
-  - scope: run
-    path: 20-architecture/contracts/*/contract.proto
-    required: false
-    modifiable: false
-  - scope: project
-    path: docs/sdd/changes/*/20-architecture/contracts/*/contract.proto
-    required: false
-    modifiable: false
-  - scope: run
-    path: 20-architecture/contracts/*/contract.sql
-    required: false
-    modifiable: false
-  - scope: project
-    path: docs/sdd/changes/*/20-architecture/contracts/*/contract.sql
-    required: false
-    modifiable: false
-  expected_mutations: []
   on_success:
     transition: r06-architecture-approval
   on_rework:
@@ -659,7 +518,6 @@ nodes:
     Проверьте C4, реальные границы/протоколы/хранилища и уровень уверенности reconstructed decisions. Принимайте карту as-is, не технический redesign.
     Approve относится только к показанной версии/manifest hash, а не к будущим изменениям. При замечаниях выберите Rework и укажите конкретные ID/критерии; при прекращении работы — Cancel run. Не разрешайте считать невыполненные/красные обязательные тесты успешными.
   produced_artifacts: []
-  expected_mutations: []
   on_approve:
     transition: r07-system-inventory
   on_rework:
@@ -711,40 +569,23 @@ nodes:
     decision=${gate1.decision!"missing"}; route=${gate1.route!"missing"}; attempt=${gate1.attempt!0};
     comment=${gate1.comment!""}
 
-    Обязательно выполни sdd-workspace-contract, затем профильные skills в перечисленном порядке.
+    Предусловия приёмки:действующие approve/route/hashes для r04-business-approval, r06-architecture-approval.
+
     Восстановите наблюдаемые интерфейсы, данные, состояния, требования и существующие native test selectors. Режим test model = inventory: planned missing coverage отдельно, имеющиеся тесты не объявлять passed; actual execution не требуется и не выдумывается. Новые e2e и source здесь не пишутся. Согласованные desired нормы и отклонения current code должны быть отдельными записями.
 
-    Предусловия приёмки: действующие approve/route/hashes для r04-business-approval, r06-architecture-approval.
-    Переданные RUN inputs прочитай по runtime-resolved адресам. Дополнительные файлы открывай по конкретным путям из индексов и проверяй hash.
-    Обязательные выходы RUN:
-    - 30-system/index.md
-    - 30-system/manifest.json
-    - 30-system/handoff.json
-    - 30-system/srs.md
-    - 30-system/system-requirements.json
-    - 30-system/contracts.md
-    - 30-system/contracts.json
-    - 30-system/test-model.md
-    - 30-system/test-model.json
-    - 30-system/traceability.csv
-    - 30-system/recovery-evidence.json
-    - 30-system/acceptance.feature
-    - 30-system/model-review.md
-    Содержимое этих документов и безопасные summaries зеркалируй в CHANGE_ROOT/30-system/. Создай также актуальный CHANGE_ROOT/control/state.json (mode, stage, attempt, source/registry hashes, approvals validity, unresolved), не подменяя runtime audit. Это не flow YAML config.
-    Перед завершением проверь существование, синтаксис, непустое смысловое содержание и соответствие точному текущему run.id всех обязательных выходов; на blocked route документы явно маркируются blocked с причинами.
-    Список actual code/test mutations запиши в manifest; ни при каких обстоятельствах не выдавай документацию за написанный код или исполненный тест.
+    Контракты файлов: выполни sdd-workspace-contract, затем профильные skill_refs по порядку. В блоках OUTPUT_CONTRACTS подключённых SKILL.md выбери только строки, где nodes содержит текущий id; там даны ВСЕ RUN имена, полные PROJECT пути, required/condition и template_id. Создай каждый declared produced_artifact строго по указанному inline-шаблону (JSON — по приложенной схеме). Списки файлов в FLOW instruction не дублируются.
+    RUN пути разрешает runtime; в PROJECT замени только change-root * на текущий run.id, остальные safe IDs бери из реального registry. Индексы ведут к файлам, не заменяют чтение. Required документы заполняются и на blocked-route с причинами, без придуманных фактов; optional создаются только по declared condition. Native evidence и seal backups не копируй в Git.
+    Перед завершением проверь точные пути, шаблоны/синтаксис, текущую ревизию, links/hashes и gate validity. Порядок: содержимое → index/handoff → manifest → control/state → runtime step-summary. Дополнительные файлы/код — только по динамическому файловому контракту профильного skill.
 
-    Субагенты: sdd-spec-test-auditor.
-    При наличии списка каждый должен быть реально вызван Qwen Task/task; положи его findings в текущие выходы. Отсутствие делегирования — BLOCKED, не inline-имитация.
+    Субагенты (реальный Qwen Task/task): sdd-spec-test-auditor.
+    Основной агент ОБЯЗАН дождаться завершения каждого вызванного сабагента и получить его итоговый ответ ДО записи финальных review/manifest/handoff и step-summary.json, выбора успешного route и завершения ноды. При асинхронном ответе дождись terminal результата через доступный механизм Task; не придумывай имя инструмента ожидания. Пока хотя бы один Task выполняется, дальше не переходи. Ошибка, timeout или недоступный Task — BLOCKED / runtime failure, не подмена inline-ревью. Сохрани полный ответ в назначенном review/index/acceptance, а task_id/статус ожидания/hashes — в manifest.invoked_subagents. Сабагенты только читают; проверь неизменность diff.
 
     Выбор route в runtime step-summary.json:
     - on_success: получены traceable SRS и test inventory; next=r08-baseline-pack.
     - on_rework: исправить инвентаризацию/доказательства; next=r07-system-inventory.
     - on_bad_spec: неверна архитектурная карта; next=r05-architecture.
     - on_bad_intent: critical evidence/context blocker; next=r11-blocker.
-    При направлении в blocker-ноду сначала запиши CHANGE_ROOT/control/blocker.json с observed reason, evidence, required action и phase. Если ситуация не укладывается в объявленные маршруты и обязательные outputs создать невозможно, сообщи runtime failure; implicit failure_node_id сохранит ошибку.
-
-    Нормативные contract files размещай в 30-system/contracts/<safe-interface-id>/contract.yaml|contract.json|contract.proto|contract.sql; перечисли каждый реально созданный файл в обязательном contracts.json и manifest. Сохрани исходный формат; выбирай только применимые файлы, не генерируй фиктивный contract ради декларации.
+    При маршруте в blocker создай control/blocker.json по полному PROJECT пути и шаблону из sdd-workspace-contract. Если обязательные выходы безопасно записать невозможно — runtime failure через failure_node_id, не фиктивный success.
   skill_refs:
   - sdd-workspace-contract@1.0
   - sdd-recover-specs@1.0
@@ -898,7 +739,6 @@ nodes:
     path: docs/sdd/changes/*/30-system/contracts/*/contract.sql
     required: false
     modifiable: false
-  expected_mutations: []
   on_success:
     transition: r08-baseline-pack
   on_rework:
@@ -960,28 +800,16 @@ nodes:
     decision=${gate1.decision!"missing"}; route=${gate1.route!"missing"}; attempt=${gate1.attempt!0};
     comment=${gate1.comment!""}
 
-    Обязательно выполни sdd-workspace-contract, затем профильные skills в перечисленном порядке.
-    В режиме baseline_inventory проверьте provenance claims, conflicts/unknowns и scope coverage. Не применяйте delivery pass policy к неисполнявшимся тестам: честно покажите not_run/unknown и missing e2e. Подготовьте exact canonical docs plan, сохраняя existing authoritative paths. Blockers достоверности не допускаются; известные пробелы можно принять как backlog, не как выполненную проверку.
+    Предусловия приёмки:действующие approve/route/hashes для r04-business-approval, r06-architecture-approval.
 
-    Предусловия приёмки: действующие approve/route/hashes для r04-business-approval, r06-architecture-approval.
-    Переданные RUN inputs прочитай по runtime-resolved адресам. Дополнительные файлы открывай по конкретным путям из индексов и проверяй hash.
-    Обязательные выходы RUN:
-    - 70-acceptance/index.md
-    - 70-acceptance/manifest.json
-    - 70-acceptance/handoff.json
-    - 70-acceptance/acceptance.md
-    - 70-acceptance/acceptance.json
-    - 70-acceptance/baseline-plan.json
-    - 70-acceptance/traceability.csv
-    - 70-acceptance/readiness.md
-    - 70-acceptance/readiness.json
-    - 70-acceptance/recovery-evidence.json
-    Содержимое этих документов и безопасные summaries зеркалируй в CHANGE_ROOT/70-acceptance/. Создай также актуальный CHANGE_ROOT/control/state.json (mode, stage, attempt, source/registry hashes, approvals validity, unresolved), не подменяя runtime audit. Это не flow YAML config.
-    Перед завершением проверь существование, синтаксис, непустое смысловое содержание и соответствие точному текущему run.id всех обязательных выходов; на blocked route документы явно маркируются blocked с причинами.
-    Список actual code/test mutations запиши в manifest; ни при каких обстоятельствах не выдавай документацию за написанный код или исполненный тест.
+    В режиме baseline_inventory проверьте provenance claims, conflicts/unknowns и scope coverage. Не применяйте delivery pass policy к неисполнявшимся тестам: честно покажите not_run/unknown и missing e2e. Подготовьте exact canonical docs plan, сохраняя existing authoritative paths. Blockers достоверности не допускаются; известные пробелы можно принять как backlog, не как выполненную проверку. Нативные контракты здесь не копируйте: указывайте точные существующие пути/hashes в recovery evidence; выпуск candidate-контрактов выполняет только r07-system-inventory.
 
-    Субагенты: sdd-evidence-auditor, sdd-spec-test-auditor, sdd-architecture-auditor.
-    При наличии списка каждый должен быть реально вызван Qwen Task/task; положи его findings в текущие выходы. Отсутствие делегирования — BLOCKED, не inline-имитация.
+    Контракты файлов: выполни sdd-workspace-contract, затем профильные skill_refs по порядку. В блоках OUTPUT_CONTRACTS подключённых SKILL.md выбери только строки, где nodes содержит текущий id; там даны ВСЕ RUN имена, полные PROJECT пути, required/condition и template_id. Создай каждый declared produced_artifact строго по указанному inline-шаблону (JSON — по приложенной схеме). Списки файлов в FLOW instruction не дублируются.
+    RUN пути разрешает runtime; в PROJECT замени только change-root * на текущий run.id, остальные safe IDs бери из реального registry. Индексы ведут к файлам, не заменяют чтение. Required документы заполняются и на blocked-route с причинами, без придуманных фактов; optional создаются только по declared condition. Native evidence и seal backups не копируй в Git.
+    Перед завершением проверь точные пути, шаблоны/синтаксис, текущую ревизию, links/hashes и gate validity. Порядок: содержимое → index/handoff → manifest → control/state → runtime step-summary. Дополнительные файлы/код — только по динамическому файловому контракту профильного skill.
+
+    Субагенты (реальный Qwen Task/task): sdd-evidence-auditor, sdd-spec-test-auditor, sdd-architecture-auditor.
+    Основной агент ОБЯЗАН дождаться завершения каждого вызванного сабагента и получить его итоговый ответ ДО записи финальных review/manifest/handoff и step-summary.json, выбора успешного route и завершения ноды. При асинхронном ответе дождись terminal результата через доступный механизм Task; не придумывай имя инструмента ожидания. Пока хотя бы один Task выполняется, дальше не переходи. Ошибка, timeout или недоступный Task — BLOCKED / runtime failure, не подмена inline-ревью. Сохрани полный ответ в назначенном review/index/acceptance, а task_id/статус ожидания/hashes — в manifest.invoked_subagents. Сабагенты только читают; проверь неизменность diff.
 
     Выбор route в runtime step-summary.json:
     - on_success: baseline accuracy packet готов; next=r09-baseline-approval.
@@ -989,11 +817,7 @@ nodes:
     - on_bad_spec: проблема architecture evidence; next=r05-architecture.
     - on_bad_intent: проблема business evidence; next=r03-business.
     - on_present: источники или инструменты недоступны; next=r11-blocker.
-    При направлении в blocker-ноду сначала запиши CHANGE_ROOT/control/blocker.json с observed reason, evidence, required action и phase. Если ситуация не укладывается в объявленные маршруты и обязательные outputs создать невозможно, сообщи runtime failure; implicit failure_node_id сохранит ошибку.
-
-    Prepared canonical contents: сохрани bytes каждого изменяемого normative file в 70-acceptance/canonical-candidates/<safe-slot-id>/content.txt (расширение transport не меняет bytes/целевой формат); обязательный baseline-plan.json связывает slot с target_path, format, before/after SHA-256. Каждое planned update должно иметь существующий и проверенный candidate, пустой список допустим только при доказанном no-op. Не изменяй эти candidate bytes после human approval.
-
-    Нормативные contract files размещай в 70-acceptance/contracts/<safe-interface-id>/contract.yaml|contract.json|contract.proto|contract.sql; перечисли каждый реально созданный файл в обязательном contracts.json и manifest. Сохрани исходный формат; выбирай только применимые файлы, не генерируй фиктивный contract ради декларации.
+    При маршруте в blocker создай control/blocker.json по полному PROJECT пути и шаблону из sdd-workspace-contract. Если обязательные выходы безопасно записать невозможно — runtime failure через failure_node_id, не фиктивный success.
   skill_refs:
   - sdd-workspace-contract@1.0
   - sdd-recover-specs@1.0
@@ -1100,39 +924,6 @@ nodes:
     path: docs/sdd/changes/*/70-acceptance/canonical-candidates/*/content.txt
     required: false
     modifiable: false
-  - scope: run
-    path: 70-acceptance/contracts/*/contract.yaml
-    required: false
-    modifiable: false
-  - scope: project
-    path: docs/sdd/changes/*/70-acceptance/contracts/*/contract.yaml
-    required: false
-    modifiable: false
-  - scope: run
-    path: 70-acceptance/contracts/*/contract.json
-    required: false
-    modifiable: false
-  - scope: project
-    path: docs/sdd/changes/*/70-acceptance/contracts/*/contract.json
-    required: false
-    modifiable: false
-  - scope: run
-    path: 70-acceptance/contracts/*/contract.proto
-    required: false
-    modifiable: false
-  - scope: project
-    path: docs/sdd/changes/*/70-acceptance/contracts/*/contract.proto
-    required: false
-    modifiable: false
-  - scope: run
-    path: 70-acceptance/contracts/*/contract.sql
-    required: false
-    modifiable: false
-  - scope: project
-    path: docs/sdd/changes/*/70-acceptance/contracts/*/contract.sql
-    required: false
-    modifiable: false
-  expected_mutations: []
   on_success:
     transition: r09-baseline-approval
   on_rework:
@@ -1192,7 +983,6 @@ nodes:
     Примите точность и границы восстановленной документации, ownership и canonical paths. Tests not_run остаются not_run. Эта приёмка не заменяет feature/e2e acceptance и не утверждает, что текущий код соответствует всем desired требованиям.
     Approve относится только к показанной версии/manifest hash, а не к будущим изменениям. При замечаниях выберите Rework и укажите конкретные ID/критерии; при прекращении работы — Cancel run. Не разрешайте считать невыполненные/красные обязательные тесты успешными.
   produced_artifacts: []
-  expected_mutations: []
   on_approve:
     transition: r10-seal
   on_rework:
@@ -1245,29 +1035,21 @@ nodes:
     decision=${gate2.decision!"missing"}; route=${gate2.route!"missing"}; attempt=${gate2.attempt!0};
     comment=${gate2.comment!""}
 
-    Обязательно выполни sdd-workspace-contract, затем профильные skills в перечисленном порядке.
+    Предусловия приёмки:действующие approve/route/hashes для r04-business-approval, r06-architecture-approval, r09-baseline-approval.
+
     После trusted baseline approval примените только подготовленные documentation updates и registry mapping. Не меняйте source/tests. Receipt kind=baseline, не delivery. Зафиксируйте scope/unknowns/неисполнявшиеся тесты для следующих feature runs.
 
-    Предусловия приёмки: действующие approve/route/hashes для r04-business-approval, r06-architecture-approval, r09-baseline-approval.
-    Переданные RUN inputs прочитай по runtime-resolved адресам. Дополнительные файлы открывай по конкретным путям из индексов и проверяй hash.
-    Обязательные выходы RUN:
-    - 71-seal/index.md
-    - 71-seal/manifest.json
-    - 71-seal/handoff.json
-    - 71-seal/seal.md
-    - 71-seal/seal.json
-    Содержимое этих документов и безопасные summaries зеркалируй в CHANGE_ROOT/71-seal/. Создай также актуальный CHANGE_ROOT/control/state.json (mode, stage, attempt, source/registry hashes, approvals validity, unresolved), не подменяя runtime audit. Это не flow YAML config.
-    Перед завершением проверь существование, синтаксис, непустое смысловое содержание и соответствие точному текущему run.id всех обязательных выходов; на blocked route документы явно маркируются blocked с причинами.
-    Список actual code/test mutations запиши в manifest; ни при каких обстоятельствах не выдавай документацию за написанный код или исполненный тест.
+    Контракты файлов: выполни sdd-workspace-contract, затем профильные skill_refs по порядку. В блоках OUTPUT_CONTRACTS подключённых SKILL.md выбери только строки, где nodes содержит текущий id; там даны ВСЕ RUN имена, полные PROJECT пути, required/condition и template_id. Создай каждый declared produced_artifact строго по указанному inline-шаблону (JSON — по приложенной схеме). Списки файлов в FLOW instruction не дублируются.
+    RUN пути разрешает runtime; в PROJECT замени только change-root * на текущий run.id, остальные safe IDs бери из реального registry. Индексы ведут к файлам, не заменяют чтение. Required документы заполняются и на blocked-route с причинами, без придуманных фактов; optional создаются только по declared condition. Native evidence и seal backups не копируй в Git.
+    Перед завершением проверь точные пути, шаблоны/синтаксис, текущую ревизию, links/hashes и gate validity. Порядок: содержимое → index/handoff → manifest → control/state → runtime step-summary. Дополнительные файлы/код — только по динамическому файловому контракту профильного skill.
 
-    Субагенты: не назначены; не сообщать о вымышленном review.
-    При наличии списка каждый должен быть реально вызван Qwen Task/task; положи его findings в текущие выходы. Отсутствие делегирования — BLOCKED, не inline-имитация.
+    Сабагенты не назначены; независимый аудит за них не выдумывай.
 
     Выбор route в runtime step-summary.json:
     - on_success: принятая база записана в репозитории; next=sdd-recover-baseline-done.
     - on_rework: baseline/source/docs изменились — нужен новый пакет и approval; next=r08-baseline-pack.
     - on_bad_intent: конфликт или частичная materialization; next=r11-blocker.
-    При направлении в blocker-ноду сначала запиши CHANGE_ROOT/control/blocker.json с observed reason, evidence, required action и phase. Если ситуация не укладывается в объявленные маршруты и обязательные outputs создать невозможно, сообщи runtime failure; implicit failure_node_id сохранит ошибку.
+    При маршруте в blocker создай control/blocker.json по полному PROJECT пути и шаблону из sdd-workspace-contract. Если обязательные выходы безопасно записать невозможно — runtime failure через failure_node_id, не фиктивный success.
   skill_refs:
   - sdd-workspace-contract@1.0
   - sdd-seal-baseline@1.0
@@ -1320,13 +1102,14 @@ nodes:
     path: docs/sdd/changes/*/control/blocker.json
     required: false
     modifiable: false
-  expected_mutations:
-  - scope: project
-    path: docs/sdd/**/*
+  - scope: run
+    path: 71-seal/journal.json
+    required: true
+    modifiable: false
+  - scope: run
+    path: 71-seal/backups/*/content.txt
     required: false
-  - scope: project
-    path: openspec/specs/**/*
-    required: false
+    modifiable: false
   on_success:
     transition: sdd-recover-baseline-done
   on_rework:
@@ -1354,28 +1137,19 @@ nodes:
     Замечания r12-unblock: ${feedback0.rework_instruction}
     </#if>
 
+    Предусловия приёмки:человеческий approve на входе этой стадии не требуется; не подделывать его.
 
-    Обязательно выполни sdd-workspace-contract, затем профильные skills в перечисленном порядке.
     Опишите evidence/access/tool/conflict blocker. Никаких предположений под видом достоверных specs.
 
-    Предусловия приёмки: человеческий approve на входе этой стадии не требуется; не подделывать его.
-    Переданные RUN inputs прочитай по runtime-resolved адресам. Дополнительные файлы открывай по конкретным путям из индексов и проверяй hash.
-    Обязательные выходы RUN:
-    - 90-blocker/index.md
-    - 90-blocker/manifest.json
-    - 90-blocker/handoff.json
-    - 90-blocker/blocker.md
-    - 90-blocker/recovery-input.md
-    Содержимое этих документов и безопасные summaries зеркалируй в CHANGE_ROOT/90-blocker/. Создай также актуальный CHANGE_ROOT/control/state.json (mode, stage, attempt, source/registry hashes, approvals validity, unresolved), не подменяя runtime audit. Это не flow YAML config.
-    Перед завершением проверь существование, синтаксис, непустое смысловое содержание и соответствие точному текущему run.id всех обязательных выходов; на blocked route документы явно маркируются blocked с причинами.
-    Список actual code/test mutations запиши в manifest; ни при каких обстоятельствах не выдавай документацию за написанный код или исполненный тест.
+    Контракты файлов: выполни sdd-workspace-contract, затем профильные skill_refs по порядку. В блоках OUTPUT_CONTRACTS подключённых SKILL.md выбери только строки, где nodes содержит текущий id; там даны ВСЕ RUN имена, полные PROJECT пути, required/condition и template_id. Создай каждый declared produced_artifact строго по указанному inline-шаблону (JSON — по приложенной схеме). Списки файлов в FLOW instruction не дублируются.
+    RUN пути разрешает runtime; в PROJECT замени только change-root * на текущий run.id, остальные safe IDs бери из реального registry. Индексы ведут к файлам, не заменяют чтение. Required документы заполняются и на blocked-route с причинами, без придуманных фактов; optional создаются только по declared condition. Native evidence и seal backups не копируй в Git.
+    Перед завершением проверь точные пути, шаблоны/синтаксис, текущую ревизию, links/hashes и gate validity. Порядок: содержимое → index/handoff → manifest → control/state → runtime step-summary. Дополнительные файлы/код — только по динамическому файловому контракту профильного skill.
 
-    Субагенты: не назначены; не сообщать о вымышленном review.
-    При наличии списка каждый должен быть реально вызван Qwen Task/task; положи его findings в текущие выходы. Отсутствие делегирования — BLOCKED, не inline-имитация.
+    Сабагенты не назначены; независимый аудит за них не выдумывай.
 
     Выбор route в runtime step-summary.json:
     - on_success: описание готово; next=r12-unblock.
-    При направлении в blocker-ноду сначала запиши CHANGE_ROOT/control/blocker.json с observed reason, evidence, required action и phase. Если ситуация не укладывается в объявленные маршруты и обязательные outputs создать невозможно, сообщи runtime failure; implicit failure_node_id сохранит ошибку.
+    Прочитай актуальную диагностику по sdd-blocker-handling; output с честным blocked status не означает приёмку продукта. При невозможности безопасной записи — runtime failure.
   skill_refs:
   - sdd-workspace-contract@1.0
   - sdd-blocker-handling@1.0
@@ -1428,7 +1202,6 @@ nodes:
     path: docs/sdd/changes/*/control/blocker.json
     required: false
     modifiable: false
-  expected_mutations: []
   on_success:
     transition: r12-unblock
 - id: r12-unblock
@@ -1453,7 +1226,6 @@ nodes:
     Устраните препятствие или уточните границы восстановления. Approve разрешает повторный анализ с сохранением ответов, но не подтверждает ещё не исследованные факты.
     Approve относится только к показанной версии/manifest hash, а не к будущим изменениям. При замечаниях выберите Rework и укажите конкретные ID/критерии; при прекращении работы — Cancel run. Не разрешайте считать невыполненные/красные обязательные тесты успешными.
   produced_artifacts: []
-  expected_mutations: []
   on_approve:
     transition: r01-discover
   on_rework:
@@ -1463,4 +1235,3 @@ nodes:
   type: terminal
   execution_context: []
   produced_artifacts: []
-  expected_mutations: []

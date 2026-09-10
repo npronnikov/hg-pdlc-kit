@@ -17,5 +17,5 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/skills/sdd-bug-reproduce/1.0
-checksum: "b5fea2ef29f699e1bfe7293f6a09c8ef1937b37fed9ccf8e661dda9fc3418f9f"
+checksum: "8a8a20dba28f49cbf7339c0d3af0e439c31c23f175959d224e58dc97a25109a2"
 skill_kind: analysis

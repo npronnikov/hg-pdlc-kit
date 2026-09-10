@@ -16,5 +16,5 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/subagents/sdd-repository-cartographer/1.0
-checksum: "aeff50c521014d5e93c3f82b41230c8ad2c504e34db73dd78fa76960d5ee5849"
+checksum: "37526df536e4a0f9497eeb65f032152ec286d42b754417c4da3daca2e96b4e5d"
 definition_file: sdd-repository-cartographer.md

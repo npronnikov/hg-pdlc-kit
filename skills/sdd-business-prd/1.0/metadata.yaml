@@ -17,5 +17,5 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/skills/sdd-business-prd/1.0
-checksum: "57f5f92955f1f1cb5be0fd02e869ba8af8ae837cc9b4b6d3726bb052b6520b67"
+checksum: "6169ac46d43204884fe593277c0988feeec312f16622006d43df2249bc45ec2c"
 skill_kind: analysis

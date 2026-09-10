@@ -17,5 +17,5 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/skills/sdd-seal-baseline/1.0
-checksum: "3213a017d7c05db822c804fdb916fe00b86cfd58ed2d444b8b3396fcfc2dde34"
+checksum: "e3ab0128a52f069066056d82925f784a00ad17140f02d07e1e6e8e2de86474f1"
 skill_kind: analysis

@@ -17,5 +17,5 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/skills/sdd-implementation-plan/1.0
-checksum: "d5c80626553840290927d21b86c8aebdc7288181b11300fba8d9497c32f1d4aa"
+checksum: "24ad02c6d27cd4f52e63f816ff61174ca12626753dc421bed6216e6502fb16ee"
 skill_kind: analysis

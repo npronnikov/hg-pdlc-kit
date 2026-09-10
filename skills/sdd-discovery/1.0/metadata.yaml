@@ -17,5 +17,5 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/skills/sdd-discovery/1.0
-checksum: "960dc2fdf25e7f72ad5799341aa7cb79ca2b2833266bb925a2b89494413e8d8d"
+checksum: "6ed02a3dfb5088acb0f079e44a9a028b0db710717a529639992ba9107fbd9856"
 skill_kind: analysis

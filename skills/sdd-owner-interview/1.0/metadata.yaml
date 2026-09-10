@@ -17,5 +17,5 @@ approval_status: draft
 lifecycle_status: active
 source_ref: master
 source_path: docs/aidlc-3/skills/sdd-owner-interview/1.0
-checksum: "bea5037bba26a27581d1cc8b4b08350ccaec69860dd575526d9d16c6f5c28974"
+checksum: "5023fe3948b9b0529f1c69230082617414fc429b60753bf1366e1163af7771c7"
 skill_kind: analysis
